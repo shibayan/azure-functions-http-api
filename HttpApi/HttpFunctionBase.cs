@@ -7,6 +7,7 @@ using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
@@ -25,6 +26,7 @@ namespace HttpApi
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         private IUrlHelper _url;
+        private ProblemDetailsFactory _problemDetailsFactory;
 
         protected HttpContext HttpContext => _httpContextAccessor.HttpContext;
         protected HttpRequest Request => HttpContext?.Request;
@@ -44,6 +46,18 @@ namespace HttpApi
                 }
 
                 return _url;
+            }
+        }
+        public ProblemDetailsFactory ProblemDetailsFactory
+        {
+            get
+            {
+                if (_problemDetailsFactory == null)
+                {
+                    _problemDetailsFactory = HttpContext?.RequestServices?.GetRequiredService<ProblemDetailsFactory>();
+                }
+
+                return _problemDetailsFactory;
             }
         }
 
@@ -83,6 +97,32 @@ namespace HttpApi
         protected ConflictResult Conflict() => new ConflictResult();
         protected ConflictObjectResult Conflict(object error) => new ConflictObjectResult(error);
         protected ConflictObjectResult Conflict(ModelStateDictionary modelState) => new ConflictObjectResult(modelState);
+
+        protected ObjectResult Problem(string detail = null, string instance = null, int? statusCode = null, string title = null, string type = null)
+        {
+            var problemDetails = ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode ?? 500, title, type, detail, instance);
+
+            return new ObjectResult(problemDetails) { StatusCode = problemDetails.Status };
+        }
+
+        protected ActionResult ValidationProblem(ValidationProblemDetails descriptor)
+        {
+            if (descriptor == null)
+            {
+                throw new ArgumentNullException(nameof(descriptor));
+            }
+
+            return new BadRequestObjectResult(descriptor);
+        }
+
+        protected ActionResult ValidationProblem(ModelStateDictionary modelState) => ValidationProblem(modelStateDictionary: modelState);
+
+        protected ObjectResult ValidationProblem(string detail = null, string instance = null, int? statusCode = null, string title = null, string type = null, ModelStateDictionary modelStateDictionary = null)
+        {
+            var validationProblem = ProblemDetailsFactory.CreateValidationProblemDetails(HttpContext, modelStateDictionary ?? ModelState, statusCode, title, type, detail, instance);
+
+            return new ObjectResult(validationProblem) { StatusCode = validationProblem.Status };
+        }
 
         protected CreatedResult Created(string uri, object value)
         {
