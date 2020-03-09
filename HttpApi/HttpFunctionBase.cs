@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
@@ -5,7 +6,11 @@ using System.Text;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 
 namespace HttpApi
@@ -19,11 +24,28 @@ namespace HttpApi
 
         private readonly IHttpContextAccessor _httpContextAccessor;
 
+        private IUrlHelper _url;
+
         protected HttpContext HttpContext => _httpContextAccessor.HttpContext;
         protected HttpRequest Request => HttpContext?.Request;
         protected HttpResponse Response => HttpContext?.Response;
         protected ClaimsPrincipal User => HttpContext?.User;
         protected ModelStateDictionary ModelState { get; } = new ModelStateDictionary();
+
+        protected IUrlHelper Url
+        {
+            get
+            {
+                if (_url == null)
+                {
+                    var factory = HttpContext?.RequestServices?.GetRequiredService<IUrlHelperFactory>();
+
+                    _url = factory?.GetUrlHelper(new ActionContext(HttpContext, HttpContext.GetRouteData(), new ActionDescriptor()));
+                }
+
+                return _url;
+            }
+        }
 
         #region IActionResult helpers
 
@@ -32,13 +54,16 @@ namespace HttpApi
 
         protected ContentResult Content(string content) => Content(content, (MediaTypeHeaderValue)null);
         protected ContentResult Content(string content, string contentType) => Content(content, MediaTypeHeaderValue.Parse(contentType));
+
         protected ContentResult Content(string content, string contentType, Encoding contentEncoding)
         {
             var mediaTypeHeaderValue = MediaTypeHeaderValue.Parse(contentType);
             mediaTypeHeaderValue.Encoding = contentEncoding ?? mediaTypeHeaderValue.Encoding;
             return Content(content, mediaTypeHeaderValue);
         }
-        protected ContentResult Content(string content, MediaTypeHeaderValue contentType) => new ContentResult { Content = content, ContentType = contentType?.ToString() };
+
+        protected ContentResult Content(string content, MediaTypeHeaderValue contentType)
+            => new ContentResult { Content = content, ContentType = contentType?.ToString() };
 
         protected NoContentResult NoContent() => new NoContentResult();
 
@@ -58,6 +83,65 @@ namespace HttpApi
         protected ConflictResult Conflict() => new ConflictResult();
         protected ConflictObjectResult Conflict(object error) => new ConflictObjectResult(error);
         protected ConflictObjectResult Conflict(ModelStateDictionary modelState) => new ConflictObjectResult(modelState);
+
+        protected CreatedResult Created(string uri, object value)
+        {
+            if (uri == null)
+            {
+                throw new ArgumentNullException(nameof(uri));
+            }
+
+            return new CreatedResult(uri, value);
+        }
+
+        protected CreatedResult Created(Uri uri, object value)
+        {
+            if (uri == null)
+            {
+                throw new ArgumentNullException(nameof(uri));
+            }
+
+            return new CreatedResult(uri, value);
+        }
+
+        protected CreatedResult CreatedAtFunction(string functionName) => CreatedAtFunction(functionName, null, null);
+        protected CreatedResult CreatedAtFunction(string functionName, object value) => CreatedAtFunction(functionName, null, value);
+
+        protected CreatedResult CreatedAtFunction(string functionName, object routeValues, object value)
+            => Created(Url.Link(functionName, routeValues), value);
+
+        protected AcceptedResult Accepted() => new AcceptedResult();
+        protected AcceptedResult Accepted(object value) => new AcceptedResult(location: null, value);
+
+        protected AcceptedResult Accepted(Uri uri)
+        {
+            if (uri == null)
+            {
+                throw new ArgumentNullException(nameof(uri));
+            }
+
+            return new AcceptedResult(uri, null);
+        }
+
+        protected AcceptedResult Accepted(string uri) => new AcceptedResult(uri, null);
+
+        protected AcceptedResult Accepted(Uri uri, object value)
+        {
+            if (uri == null)
+            {
+                throw new ArgumentNullException(nameof(uri));
+            }
+
+            return new AcceptedResult(uri, value);
+        }
+
+        protected AcceptedResult Accepted(string uri, object value) => new AcceptedResult(uri, value);
+
+        protected AcceptedResult AcceptedAtFunction(string functionName) => AcceptedAtFunction(functionName, null, null);
+        protected AcceptedResult AcceptedAtFunction(string functionName, object value) => AcceptedAtFunction(functionName, null, value);
+
+        protected AcceptedResult AcceptedAtFunction(string functionName, object routeValues, object value)
+            => Accepted(Url.Link(functionName, routeValues), value);
 
         protected ForbidResult Forbid() => new ForbidResult();
 

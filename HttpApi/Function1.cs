@@ -35,6 +35,8 @@ namespace HttpApi
         [Required]
         public string Name { get; set; }
 
+        public string[] Array { get; set; }
+
         [Range(100, 10000)]
         public int Price { get; set; }
     }
