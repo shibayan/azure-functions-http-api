@@ -1,0 +1,99 @@
+trigger:
+  branches:
+    include:
+    - master
+  tags:
+    include:
+    - v*
+
+variables:
+  buildConfiguration: Release
+  dotnetSdkVersion: '3.1.x'
+  isGitHubTag: $[startsWith(variables['Build.SourceBranch'], 'refs/tags/v')]
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  NUGET_XMLDOC_MODE: skip
+
+stages:
+- stage: Build
+  jobs:
+  - job: Test_Build
+    condition: eq(variables['isGitHubTag'], false)
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - task: UseDotNet@2
+      inputs:
+        packageType: 'sdk'
+        version: $(dotnetSdkVersion)
+      displayName: 'Install .NET Core SDK $(dotnetSdkVersion)'
+
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'custom'
+        custom: 'tool'
+        arguments: 'update -g dotnet-format'
+      displayName: 'Install .NET Core format tool'
+
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'build'
+        arguments: '-c $(buildConfiguration)'
+      displayName: 'Build for test'
+
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'custom'
+        custom: 'format'
+        arguments: '--dry-run --check --verbosity diagnostic'
+      displayName: 'Lint C# code'
+
+  - job: Build_NuPkg
+    condition: eq(variables['isGitHubTag'], true)
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - task: UseDotNet@2
+      inputs:
+        packageType: 'sdk'
+        version: $(dotnetSdkVersion)
+      displayName: 'Install .NET Core SDK $(dotnetSdkVersion)'
+
+    - powershell: 'echo "##vso[task.setvariable variable=PackageVersion]$($env:Build_SourceBranchName.Substring(1))"'
+      displayName: 'PowerShell Script'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet pack'
+      inputs:
+        command: pack
+        packagesToPack: 'src/**/*.csproj'
+        packDirectory: '$(Build.SourcesDirectory)/dist'
+        versioningScheme: byEnvVar
+        versionEnvVar: PackageVersion
+        verbosityPack: Normal
+
+    - publish: dist
+      artifact: nupkg
+      displayName: 'Publish artifacts'
+
+- stage: Publish
+  dependsOn: Build
+  condition: and(succeeded(), eq(variables['isGitHubTag'], true))
+  jobs:
+  - job: Publish_Nupkg
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - checkout: none
+
+    - download: current
+      artifact: nupkg
+      displayName: 'Download artifact'
+
+    - task: NuGetCommand@2
+      displayName: 'NuGet push'
+      inputs:
+        command: push
+        packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg'
+        nuGetFeedType: external
+        publishFeedCredentials: NuGet
+        verbosityPush: Normal

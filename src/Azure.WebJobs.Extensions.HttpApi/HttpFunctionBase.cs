@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 
-namespace HttpApi
+namespace Azure.WebJobs.Extensions.HttpApi
 {
     public abstract class HttpFunctionBase
     {
@@ -49,17 +49,7 @@ namespace HttpApi
             }
         }
         public ProblemDetailsFactory ProblemDetailsFactory
-        {
-            get
-            {
-                if (_problemDetailsFactory == null)
-                {
-                    _problemDetailsFactory = HttpContext?.RequestServices?.GetRequiredService<ProblemDetailsFactory>();
-                }
-
-                return _problemDetailsFactory;
-            }
-        }
+            => _problemDetailsFactory ??= HttpContext?.RequestServices?.GetRequiredService<ProblemDetailsFactory>();
 
         #region IActionResult helpers
 
