@@ -173,7 +173,8 @@ namespace Azure.WebJobs.Extensions.HttpApi
         protected AcceptedResult AcceptedAtFunction(string functionName, object routeValues, object value)
             => Accepted(Url.Link(functionName, routeValues), value);
 
-        protected ForbidResult Forbid() => new ForbidResult();
+        protected StatusCodeResult Forbid() => StatusCode(StatusCodes.Status403Forbidden);
+        protected ObjectResult Forbid(object value) => StatusCode(StatusCodes.Status403Forbidden, value);
 
         #endregion
 
