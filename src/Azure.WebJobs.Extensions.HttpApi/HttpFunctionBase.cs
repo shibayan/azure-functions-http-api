@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Security.Claims;
 using System.Text;
 
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Net.Http.Headers;
 
 namespace Azure.WebJobs.Extensions.HttpApi
@@ -27,6 +29,8 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         private IUrlHelper _url;
         private ProblemDetailsFactory _problemDetailsFactory;
+
+        private static readonly IFileProvider _functionFileProvider = new PhysicalFileProvider(FunctionEnvironment.RootPath);
 
         protected HttpContext HttpContext => _httpContextAccessor.HttpContext;
         protected HttpRequest Request => HttpContext?.Request;
@@ -73,6 +77,24 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         protected OkResult Ok() => new OkResult();
         protected OkObjectResult Ok(object value) => new OkObjectResult(value);
+
+        protected FileContentResult File(byte[] fileContents, string contentType)
+            => File(fileContents, contentType, null);
+
+        protected FileContentResult File(byte[] fileContents, string contentType, string fileDownloadName)
+            => new FileContentResult(fileContents, contentType) { FileDownloadName = fileDownloadName };
+
+        protected FileStreamResult File(Stream fileStream, string contentType)
+            => File(fileStream, contentType, null);
+
+        protected FileStreamResult File(Stream fileStream, string contentType, string fileDownloadName)
+            => new FileStreamResult(fileStream, contentType) { FileDownloadName = fileDownloadName };
+
+        protected VirtualFileResult File(string virtualPath, string contentType)
+            => File(virtualPath, contentType, null);
+
+        protected VirtualFileResult File(string virtualPath, string contentType, string fileDownloadName)
+            => new VirtualFileResult(virtualPath, contentType) { FileDownloadName = fileDownloadName, FileProvider = _functionFileProvider };
 
         protected UnauthorizedResult Unauthorized() => new UnauthorizedResult();
         protected UnauthorizedObjectResult Unauthorized(object value) => new UnauthorizedObjectResult(value);
