@@ -10,6 +10,12 @@ Package Name | Target Framework | NuGet
 ---|---|---
 WebJobs.Extensions.HttpApi | .NET Core 3.1 | [![NuGet](https://img.shields.io/nuget/v/WebJobs.Extensions.HttpApi.svg)](https://www.nuget.org/packages/WebJobs.Extensions.HttpApi)
 
+## Features
+
+- Model validation
+- ASP.NET Core like helpers
+- Support URL generation
+
 ## Basic usage
 
 ### Model validation
@@ -49,7 +55,7 @@ public class SampleModel
 }
 ```
 
-### ASP.NET Core like properties
+### ASP.NET Core like helpers
 
 ```csharp
 public class Function2 : HttpFunctionBase
@@ -90,6 +96,26 @@ public class Function3 : HttpFunctionBase
         ILogger log)
     {
         return CreatedAtFunction("Function3", new { id = "kazuakix" }, null);
+    }
+}
+```
+
+### Handle static content
+
+```csharp
+public class Function1 : HttpFunctionBase
+{
+    public Function1(IHttpContextAccessor httpContextAccessor)
+        : base(httpContextAccessor)
+    {
+    }
+
+    [FunctionName("Function1")]
+    public IActionResult Run(
+        [HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req,
+        ILogger log)
+    {
+        return File("sample.html");
     }
 }
 ```
