@@ -95,7 +95,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
             => new FileStreamResult(fileStream, contentType) { FileDownloadName = fileDownloadName };
 
         protected VirtualFileResult File(string virtualPath)
-            => File(virtualPath, _contentTypeProvider.TryGetContentType(virtualPath, out var contentType) ? contentType : "");
+            => File(virtualPath, _contentTypeProvider.TryGetContentType(virtualPath, out var contentType) ? contentType : DefaultContentType);
 
         protected VirtualFileResult File(string virtualPath, string contentType)
             => File(virtualPath, contentType, null);
