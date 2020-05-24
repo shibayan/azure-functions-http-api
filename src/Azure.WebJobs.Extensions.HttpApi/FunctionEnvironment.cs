@@ -6,6 +6,6 @@ namespace Azure.WebJobs.Extensions.HttpApi
     {
         public static bool IsAvailable => !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
 
-        public static string RootPath { get; } = IsAvailable ? Environment.ExpandEnvironmentVariables(@"%HOME%\site\wwwroot") : Environment.CurrentDirectory;
+        public static string RootPath => IsAvailable ? Environment.ExpandEnvironmentVariables(@"%HOME%\site\wwwroot") : Environment.CurrentDirectory;
     }
 }
