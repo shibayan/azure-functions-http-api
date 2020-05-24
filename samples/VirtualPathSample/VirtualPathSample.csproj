@@ -4,8 +4,10 @@
     <AzureFunctionsVersion>v3</AzureFunctionsVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.5" />
-    <PackageReference Include="WebJobs.Extensions.HttpApi" Version="1.0.2" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.7" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Azure.WebJobs.Extensions.HttpApi\Azure.WebJobs.Extensions.HttpApi.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">

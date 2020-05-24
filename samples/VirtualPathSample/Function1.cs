@@ -20,7 +20,7 @@ namespace VirtualPathSample
             [HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req,
             ILogger log)
         {
-            return File("sample.html", "text/html");
+            return File("sample.html");
         }
     }
 }
