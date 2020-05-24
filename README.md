@@ -1,6 +1,7 @@
 # HTTP API Extensions for Azure Functions v3
 
-[![Build Status](https://dev.azure.com/shibayan/azure-functions-http-api/_apis/build/status/Build%20azure-functions-http-api?branchName=master)](https://dev.azure.com/shibayan/azure-functions-http-api/_build/latest?definitionId=57&branchName=master)
+
+![Build](https://github.com/shibayan/azure-functions-http-api/workflows/Build/badge.svg)
 [![License](https://img.shields.io/github/license/shibayan/azure-functions-http-api.svg)](https://github.com/shibayan/azure-functions-http-api/blob/master/LICENSE)
 
 ## NuGet Packages
