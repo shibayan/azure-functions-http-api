@@ -15,6 +15,7 @@ WebJobs.Extensions.HttpApi | .NET Core 3.1 | [![NuGet](https://img.shields.io/nu
 - Model validation
 - ASP.NET Core like helpers
 - Support URL generation
+- Handle static files
 
 ## Basic usage
 
@@ -100,7 +101,7 @@ public class Function3 : HttpFunctionBase
 }
 ```
 
-### Handle static content
+### Handle static files
 
 ```csharp
 public class Function1 : HttpFunctionBase
