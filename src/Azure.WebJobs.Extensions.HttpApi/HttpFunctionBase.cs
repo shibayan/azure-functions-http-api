@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Net.Http.Headers;
@@ -30,7 +31,10 @@ namespace Azure.WebJobs.Extensions.HttpApi
         private IUrlHelper _url;
         private ProblemDetailsFactory _problemDetailsFactory;
 
-        private static readonly IFileProvider _functionFileProvider = new PhysicalFileProvider(FunctionEnvironment.RootPath);
+        private const string DefaultContentType = "application/octet-stream";
+
+        private static readonly IFileProvider _fileProvider = new PhysicalFileProvider(FunctionEnvironment.RootPath);
+        private static readonly IContentTypeProvider _contentTypeProvider = new FileExtensionContentTypeProvider();
 
         protected HttpContext HttpContext => _httpContextAccessor.HttpContext;
         protected HttpRequest Request => HttpContext?.Request;
@@ -90,11 +94,14 @@ namespace Azure.WebJobs.Extensions.HttpApi
         protected FileStreamResult File(Stream fileStream, string contentType, string fileDownloadName)
             => new FileStreamResult(fileStream, contentType) { FileDownloadName = fileDownloadName };
 
+        protected VirtualFileResult File(string virtualPath)
+            => File(virtualPath, _contentTypeProvider.TryGetContentType(virtualPath, out var contentType) ? contentType : "");
+
         protected VirtualFileResult File(string virtualPath, string contentType)
             => File(virtualPath, contentType, null);
 
         protected VirtualFileResult File(string virtualPath, string contentType, string fileDownloadName)
-            => new VirtualFileResult(virtualPath, contentType) { FileDownloadName = fileDownloadName, FileProvider = _functionFileProvider };
+            => new VirtualFileResult(virtualPath, contentType) { FileDownloadName = fileDownloadName, FileProvider = _fileProvider };
 
         protected UnauthorizedResult Unauthorized() => new UnauthorizedResult();
         protected UnauthorizedObjectResult Unauthorized(object value) => new UnauthorizedObjectResult(value);
