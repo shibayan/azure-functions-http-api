@@ -213,17 +213,6 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         protected bool TryValidateModel(object model)
         {
-            //var validationResults = new List<ValidationResult>();
-
-            //Validator.TryValidateObject(model, new ValidationContext(model), validationResults, true);
-
-            //foreach (var validationResult in validationResults)
-            //{
-            //    foreach (var memberName in validationResult.MemberNames)
-            //    {
-            //        ModelState.AddModelError(memberName, validationResult.ErrorMessage);
-            //    }
-            //}
             var actionContext = new ActionContext(HttpContext, HttpContext.GetRouteData(), new ActionDescriptor(), ModelState);
 
             ObjectValidator.Validate(actionContext, null, string.Empty, model);
