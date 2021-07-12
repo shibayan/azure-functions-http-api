@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 using Azure.WebJobs.Extensions.HttpApi;
 
@@ -17,7 +17,7 @@ namespace BasicSample
         {
         }
 
-        [FunctionName("Function2")]
+        [FunctionName(nameof(Function2))]
         public IActionResult Run(
             [HttpTrigger(AuthorizationLevel.Function, "get")]
             HttpRequest req,

@@ -1,6 +1,4 @@
-using System.ComponentModel.DataAnnotations;
-
-using Azure.WebJobs.Extensions.HttpApi;
+﻿using Azure.WebJobs.Extensions.HttpApi;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +15,7 @@ namespace BasicSample
         {
         }
 
-        [FunctionName("Function1")]
+        [FunctionName(nameof(Function1))]
         public IActionResult Run(
             [HttpTrigger(AuthorizationLevel.Function, "post")]
             SampleModel model,
@@ -30,16 +28,5 @@ namespace BasicSample
 
             return Ok(model);
         }
-    }
-
-    public class SampleModel
-    {
-        [Required]
-        public string Name { get; set; }
-
-        public string[] Array { get; set; }
-
-        [Range(100, 10000)]
-        public int Price { get; set; }
     }
 }

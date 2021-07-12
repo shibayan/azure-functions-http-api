@@ -8,22 +8,22 @@ using Microsoft.Extensions.Logging;
 
 namespace BasicSample
 {
-    public class Function4 : HttpFunctionBase
+    public class Function5 : HttpFunctionBase
     {
-        public Function4(IHttpContextAccessor httpContextAccessor)
+        public Function5(IHttpContextAccessor httpContextAccessor)
             : base(httpContextAccessor)
         {
         }
 
-        [FunctionName(nameof(Function4))]
+        [FunctionName(nameof(Function5))]
         public IActionResult Run(
             [HttpTrigger(AuthorizationLevel.Function, "post")]
-            SampleModel model,
+            SampleNestedModel model,
             ILogger log)
         {
             if (!TryValidateModel(model))
             {
-                return ValidationProblem(ModelState);
+                return BadRequest(ModelState);
             }
 
             return Ok(model);
