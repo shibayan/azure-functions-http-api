@@ -1,6 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System;
 using System.IO;
 using System.Security.Claims;
 using System.Text;
@@ -10,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.StaticFiles;
@@ -29,6 +28,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         private IUrlHelper _url;
+        private IObjectModelValidator _objectModelValidator;
         private ProblemDetailsFactory _problemDetailsFactory;
 
         private const string DefaultContentType = "application/octet-stream";
@@ -56,6 +56,10 @@ namespace Azure.WebJobs.Extensions.HttpApi
                 return _url;
             }
         }
+
+        public IObjectModelValidator ObjectValidator
+            => _objectModelValidator ??= HttpContext?.RequestServices?.GetRequiredService<IObjectModelValidator>();
+
         public ProblemDetailsFactory ProblemDetailsFactory
             => _problemDetailsFactory ??= HttpContext?.RequestServices?.GetRequiredService<ProblemDetailsFactory>();
 
@@ -209,17 +213,20 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         protected bool TryValidateModel(object model)
         {
-            var validationResults = new List<ValidationResult>();
+            //var validationResults = new List<ValidationResult>();
 
-            Validator.TryValidateObject(model, new ValidationContext(model), validationResults, true);
+            //Validator.TryValidateObject(model, new ValidationContext(model), validationResults, true);
 
-            foreach (var validationResult in validationResults)
-            {
-                foreach (var memberName in validationResult.MemberNames)
-                {
-                    ModelState.AddModelError(memberName, validationResult.ErrorMessage);
-                }
-            }
+            //foreach (var validationResult in validationResults)
+            //{
+            //    foreach (var memberName in validationResult.MemberNames)
+            //    {
+            //        ModelState.AddModelError(memberName, validationResult.ErrorMessage);
+            //    }
+            //}
+            var actionContext = new ActionContext(HttpContext, HttpContext.GetRouteData(), new ActionDescriptor(), ModelState);
+
+            ObjectValidator.Validate(actionContext, null, string.Empty, model);
 
             return ModelState.IsValid;
         }
