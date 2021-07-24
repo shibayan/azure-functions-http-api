@@ -4,21 +4,25 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
-
   <PropertyGroup>
-    <Version>1.0.0</Version>
     <Authors>shibayan</Authors>
     <Company>shibayan</Company>
     <PackageId>WebJobs.Extensions.HttpApi</PackageId>
     <Description>HTTP API Extensions for Azure Functions v3</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageReleaseNotes>https://github.com/shibayan/azure-functions-http-api/releases</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>Azure;WebJobs;AzureFunctions;Http;Api</PackageTags>
     <RepositoryUrl>https://github.com/shibayan/azure-functions-http-api</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
 
 </Project>
