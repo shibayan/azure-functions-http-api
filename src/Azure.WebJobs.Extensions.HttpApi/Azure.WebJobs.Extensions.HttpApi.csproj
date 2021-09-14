@@ -7,7 +7,7 @@
   <PropertyGroup>
     <Authors>shibayan</Authors>
     <PackageId>WebJobs.Extensions.HttpApi</PackageId>
-    <Description>HTTP API Extensions for Azure Functions</Description>
+    <Description>HTTP API Extensions for Azure Functions v4</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageReleaseNotes>https://github.com/shibayan/azure-functions-http-api/releases</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
