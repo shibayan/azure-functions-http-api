@@ -6,7 +6,6 @@
 
   <PropertyGroup>
     <Authors>shibayan</Authors>
-    <Company>shibayan</Company>
     <PackageId>WebJobs.Extensions.HttpApi</PackageId>
     <Description>HTTP API Extensions for Azure Functions</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
