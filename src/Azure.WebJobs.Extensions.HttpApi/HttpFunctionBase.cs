@@ -35,6 +35,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         private static readonly IFileProvider _fileProvider = new PhysicalFileProvider(FunctionEnvironment.RootPath);
         private static readonly IContentTypeProvider _contentTypeProvider = new FileExtensionContentTypeProvider();
+        private static readonly ProxyInvoker _proxyInvoker = new ProxyInvoker();
 
         protected HttpContext HttpContext => _httpContextAccessor.HttpContext;
         protected HttpRequest Request => HttpContext?.Request;
@@ -208,6 +209,16 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         protected StatusCodeResult Forbid() => StatusCode(StatusCodes.Status403Forbidden);
         protected ObjectResult Forbid(object value) => StatusCode(StatusCodes.Status403Forbidden, value);
+
+        protected IActionResult Proxy(string template)
+        {
+            if (template == null)
+            {
+                throw new ArgumentNullException(nameof(template));
+            }
+
+            return new ProxyResult(template) { ProxyInvoker = _proxyInvoker };
+        }
 
         #endregion
 
