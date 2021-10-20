@@ -57,10 +57,10 @@ namespace Azure.WebJobs.Extensions.HttpApi
             }
         }
 
-        public IObjectModelValidator ObjectValidator
+        protected IObjectModelValidator ObjectValidator
             => _objectModelValidator ??= HttpContext?.RequestServices?.GetRequiredService<IObjectModelValidator>();
 
-        public ProblemDetailsFactory ProblemDetailsFactory
+        protected ProblemDetailsFactory ProblemDetailsFactory
             => _problemDetailsFactory ??= HttpContext?.RequestServices?.GetRequiredService<ProblemDetailsFactory>();
 
         #region IActionResult helpers
