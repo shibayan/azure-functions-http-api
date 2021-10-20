@@ -34,4 +34,4 @@ jobs:
       run: dotnet build -c Release
 
     - name: Lint C# code
-      run: dotnet format --check --verbosity detailed
+      run: dotnet format --verify-no-changes --verbosity detailed
