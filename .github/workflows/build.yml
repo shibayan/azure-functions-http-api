@@ -7,7 +7,8 @@ on:
     branches: [ master ]
 
 env:
-  DOTNET_VERSION: 3.1.x
+  DOTNET_VERSION: 6.0.x
+  DOTNETCORE_VERSION: 3.1.x
 
 jobs:
   build:
@@ -15,16 +16,22 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Use .NET Core ${{ env.DOTNET_VERSION }}
+    - name: Use .NET ${{ env.DOTNET_VERSION }}
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
+        include-prerelease: true
 
-    - name: Install .NET Core format tool
+    - name: Use .NET Core ${{ env.DOTNETCORE_VERSION }}
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: ${{ env.DOTNETCORE_VERSION }}
+
+    - name: Install .NET format tool
       run: dotnet tool update -g dotnet-format
 
     - name: Build project
       run: dotnet build -c Release
 
     - name: Lint C# code
-      run: dotnet format --check --verbosity detailed
+      run: dotnet format --verify-no-changes --verbosity detailed --no-restore

@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>net6.0;netcoreapp3.1</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup>
     <Authors>shibayan</Authors>
+    <Description>HTTP API Extensions for Azure Functions</Description>
     <PackageId>WebJobs.Extensions.HttpApi</PackageId>
-    <Description>HTTP API Extensions for Azure Functions v3</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageReleaseNotes>https://github.com/shibayan/azure-functions-http-api/releases</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
