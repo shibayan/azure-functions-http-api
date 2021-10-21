@@ -4,16 +4,16 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Mvc;
 
-namespace Azure.WebJobs.Extensions.HttpApi
+namespace Azure.WebJobs.Extensions.HttpApi.Proxy
 {
     internal class ProxyResult : IActionResult
     {
-        public ProxyResult(string template)
+        public ProxyResult(string backendUri)
         {
-            _template = template;
+            _backendUri = backendUri;
         }
 
-        private readonly string _template;
+        private readonly string _backendUri;
 
         private static readonly Regex _templateRegex = new Regex(@"\{([^\{\}]+)\}", RegexOptions.Compiled);
 
@@ -23,9 +23,9 @@ namespace Azure.WebJobs.Extensions.HttpApi
         {
             try
             {
-                var backend = MakeBackendUrl(context);
+                var backendUri = MakeBackendUri(context);
 
-                await ProxyInvoker.SendAsync(backend, context.HttpContext);
+                await ProxyInvoker.SendAsync(backendUri, context.HttpContext);
             }
             catch
             {
@@ -33,11 +33,11 @@ namespace Azure.WebJobs.Extensions.HttpApi
             }
         }
 
-        private string MakeBackendUrl(ActionContext context)
+        private string MakeBackendUri(ActionContext context)
         {
             var routeValues = context.RouteData.Values;
 
-            var backend = _templateRegex.Replace(_template, match =>
+            var backend = _templateRegex.Replace(_backendUri, match =>
             {
                 if (routeValues.TryGetValue(match.Groups[1].Value, out var value) && value != null)
                 {

@@ -3,6 +3,8 @@ using System.IO;
 using System.Security.Claims;
 using System.Text;
 
+using Azure.WebJobs.Extensions.HttpApi.Proxy;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -210,14 +212,14 @@ namespace Azure.WebJobs.Extensions.HttpApi
         protected StatusCodeResult Forbid() => StatusCode(StatusCodes.Status403Forbidden);
         protected ObjectResult Forbid(object value) => StatusCode(StatusCodes.Status403Forbidden, value);
 
-        protected IActionResult Proxy(string template)
+        protected IActionResult Proxy(string backendUri)
         {
-            if (template == null)
+            if (backendUri == null)
             {
-                throw new ArgumentNullException(nameof(template));
+                throw new ArgumentNullException(nameof(backendUri));
             }
 
-            return new ProxyResult(template) { ProxyInvoker = _proxyInvoker };
+            return new ProxyResult(backendUri) { ProxyInvoker = _proxyInvoker };
         }
 
         #endregion

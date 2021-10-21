@@ -8,19 +8,19 @@ using Microsoft.Extensions.Logging;
 
 namespace ProxySample
 {
-    public class Function1 : HttpFunctionBase
+    public class HttpTrigger1 : HttpFunctionBase
     {
-        public Function1(IHttpContextAccessor httpContextAccessor)
+        public HttpTrigger1(IHttpContextAccessor httpContextAccessor)
             : base(httpContextAccessor)
         {
         }
 
-        [FunctionName("Function1")]
+        [FunctionName(nameof(HttpTrigger1))]
         public IActionResult Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "{*path}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = $"api/{nameof(HttpTrigger1)}")] HttpRequest req,
             ILogger log)
         {
-            return Proxy("https://shibayan.jp/{path}");
+            return Ok(req.Query["name"]);
         }
     }
 }
