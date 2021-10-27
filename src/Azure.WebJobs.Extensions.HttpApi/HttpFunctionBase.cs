@@ -1,7 +1,11 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
+
+using Azure.WebJobs.Extensions.HttpApi.Internal;
+using Azure.WebJobs.Extensions.HttpApi.Proxy;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -35,6 +39,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         private static readonly IFileProvider _fileProvider = new PhysicalFileProvider(FunctionEnvironment.RootPath);
         private static readonly IContentTypeProvider _contentTypeProvider = new FileExtensionContentTypeProvider();
+        private static readonly ProxyInvoker _proxyInvoker = new ProxyInvoker();
 
         protected HttpContext HttpContext => _httpContextAccessor.HttpContext;
         protected HttpRequest Request => HttpContext?.Request;
@@ -46,7 +51,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
         {
             get
             {
-                if (_url == null)
+                if (_url is null)
                 {
                     var factory = HttpContext?.RequestServices?.GetRequiredService<IUrlHelperFactory>();
 
@@ -57,10 +62,10 @@ namespace Azure.WebJobs.Extensions.HttpApi
             }
         }
 
-        public IObjectModelValidator ObjectValidator
+        protected IObjectModelValidator ObjectValidator
             => _objectModelValidator ??= HttpContext?.RequestServices?.GetRequiredService<IObjectModelValidator>();
 
-        public ProblemDetailsFactory ProblemDetailsFactory
+        protected ProblemDetailsFactory ProblemDetailsFactory
             => _problemDetailsFactory ??= HttpContext?.RequestServices?.GetRequiredService<ProblemDetailsFactory>();
 
         #region IActionResult helpers
@@ -130,7 +135,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         protected ActionResult ValidationProblem(ValidationProblemDetails descriptor)
         {
-            if (descriptor == null)
+            if (descriptor is null)
             {
                 throw new ArgumentNullException(nameof(descriptor));
             }
@@ -149,7 +154,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         protected CreatedResult Created(string uri, object value)
         {
-            if (uri == null)
+            if (uri is null)
             {
                 throw new ArgumentNullException(nameof(uri));
             }
@@ -159,7 +164,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         protected CreatedResult Created(Uri uri, object value)
         {
-            if (uri == null)
+            if (uri is null)
             {
                 throw new ArgumentNullException(nameof(uri));
             }
@@ -178,7 +183,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         protected AcceptedResult Accepted(Uri uri)
         {
-            if (uri == null)
+            if (uri is null)
             {
                 throw new ArgumentNullException(nameof(uri));
             }
@@ -190,7 +195,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         protected AcceptedResult Accepted(Uri uri, object value)
         {
-            if (uri == null)
+            if (uri is null)
             {
                 throw new ArgumentNullException(nameof(uri));
             }
@@ -208,6 +213,26 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         protected StatusCodeResult Forbid() => StatusCode(StatusCodes.Status403Forbidden);
         protected ObjectResult Forbid(object value) => StatusCode(StatusCodes.Status403Forbidden, value);
+
+        protected IActionResult Proxy(string backendUri, Action<HttpRequestMessage> before = null, Action<HttpResponseMessage> after = null)
+        {
+            if (backendUri is null)
+            {
+                throw new ArgumentNullException(nameof(backendUri));
+            }
+
+            return new ProxyResult(backendUri) { ProxyInvoker = _proxyInvoker, Before = before, After = after };
+        }
+
+        protected IActionResult StaticWebsite(string backendUri, string fallbackExclude = null)
+        {
+            if (backendUri is null)
+            {
+                throw new ArgumentNullException(nameof(backendUri));
+            }
+
+            return new StaticWebsiteResult(backendUri) { ProxyInvoker = _proxyInvoker, FallbackExclude = fallbackExclude };
+        }
 
         #endregion
 

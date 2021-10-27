@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Azure.WebJobs.Extensions.HttpApi
+namespace Azure.WebJobs.Extensions.HttpApi.Internal
 {
     internal static class FunctionEnvironment
     {
