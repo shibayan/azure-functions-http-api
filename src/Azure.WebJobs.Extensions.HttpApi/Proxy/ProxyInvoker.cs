@@ -10,7 +10,7 @@ namespace Azure.WebJobs.Extensions.HttpApi.Proxy
 {
     internal class ProxyInvoker
     {
-        public async Task SendAsync(string destinationUri, HttpContext httpContext)
+        public async Task SendAsync(string destinationUri, HttpContext httpContext, Action<HttpRequestMessage> before = null, Action<HttpResponseMessage> after = null)
         {
             var request = new HttpRequestMessage
             {
@@ -25,7 +25,11 @@ namespace Azure.WebJobs.Extensions.HttpApi.Proxy
                 request.Content = new StreamContent(httpContext.Request.Body);
             }
 
+            before?.Invoke(request);
+
             var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, httpContext.RequestAborted);
+
+            after?.Invoke(response);
 
             httpContext.Response.StatusCode = (int)response.StatusCode;
 

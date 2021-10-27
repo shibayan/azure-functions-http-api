@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Extensions.Logging;
 
 namespace ProxySample
 {
@@ -18,10 +17,15 @@ namespace ProxySample
         [FunctionName(nameof(StaticWebsite))]
         public IActionResult Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "put", "delete", "options", "head", "patch", Route = "{*path}")]
-            HttpRequest req,
-            ILogger log)
+            HttpRequest req)
         {
-            return Proxy("https://ststaticwebsiteproxy.z11.web.core.windows.net/{path}");
+            return Proxy("https://ststaticwebsiteproxy.z11.web.core.windows.net/{path}", after: response =>
+            {
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    response.StatusCode = System.Net.HttpStatusCode.OK;
+                }
+            });
         }
     }
 }

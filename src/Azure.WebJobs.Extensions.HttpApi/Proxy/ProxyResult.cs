@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -19,13 +21,17 @@ namespace Azure.WebJobs.Extensions.HttpApi.Proxy
 
         public ProxyInvoker ProxyInvoker { get; set; }
 
+        public Action<HttpRequestMessage> Before { get; set; }
+
+        public Action<HttpResponseMessage> After { get; set; }
+
         public async Task ExecuteResultAsync(ActionContext context)
         {
             try
             {
                 var backendUri = MakeBackendUri(context);
 
-                await ProxyInvoker.SendAsync(backendUri, context.HttpContext);
+                await ProxyInvoker.SendAsync(backendUri, context.HttpContext, Before, After);
             }
             catch
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 
@@ -213,14 +214,14 @@ namespace Azure.WebJobs.Extensions.HttpApi
         protected StatusCodeResult Forbid() => StatusCode(StatusCodes.Status403Forbidden);
         protected ObjectResult Forbid(object value) => StatusCode(StatusCodes.Status403Forbidden, value);
 
-        protected IActionResult Proxy(string backendUri)
+        protected IActionResult Proxy(string backendUri, Action<HttpRequestMessage> before = null, Action<HttpResponseMessage> after = null)
         {
             if (backendUri is null)
             {
                 throw new ArgumentNullException(nameof(backendUri));
             }
 
-            return new ProxyResult(backendUri) { ProxyInvoker = _proxyInvoker };
+            return new ProxyResult(backendUri) { ProxyInvoker = _proxyInvoker, Before = before, After = after };
         }
 
         #endregion
