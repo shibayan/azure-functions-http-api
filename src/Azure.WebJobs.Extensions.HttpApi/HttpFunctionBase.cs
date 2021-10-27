@@ -3,6 +3,7 @@ using System.IO;
 using System.Security.Claims;
 using System.Text;
 
+using Azure.WebJobs.Extensions.HttpApi.Internal;
 using Azure.WebJobs.Extensions.HttpApi.Proxy;
 
 using Microsoft.AspNetCore.Http;
