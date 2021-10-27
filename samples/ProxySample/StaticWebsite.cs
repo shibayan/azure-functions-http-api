@@ -19,13 +19,7 @@ namespace ProxySample
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "put", "delete", "options", "head", "patch", Route = "{*path}")]
             HttpRequest req)
         {
-            return Proxy("https://ststaticwebsiteproxy.z11.web.core.windows.net/{path}", after: response =>
-            {
-                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                {
-                    response.StatusCode = System.Net.HttpStatusCode.OK;
-                }
-            });
+            return StaticWebsite("https://ststaticwebsiteproxy.z11.web.core.windows.net/{path}", fallbackExclude: $"^/_nuxt/.*");
         }
     }
 }

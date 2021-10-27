@@ -224,6 +224,16 @@ namespace Azure.WebJobs.Extensions.HttpApi
             return new ProxyResult(backendUri) { ProxyInvoker = _proxyInvoker, Before = before, After = after };
         }
 
+        protected IActionResult StaticWebsite(string backendUri, string fallbackExclude = null)
+        {
+            if (backendUri is null)
+            {
+                throw new ArgumentNullException(nameof(backendUri));
+            }
+
+            return new StaticWebsiteResult(backendUri) { ProxyInvoker = _proxyInvoker, FallbackExclude = fallbackExclude };
+        }
+
         #endregion
 
         protected bool TryValidateModel(object model)
