@@ -49,7 +49,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
         {
             get
             {
-                if (_url == null)
+                if (_url is null)
                 {
                     var factory = HttpContext?.RequestServices?.GetRequiredService<IUrlHelperFactory>();
 
@@ -133,7 +133,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         protected ActionResult ValidationProblem(ValidationProblemDetails descriptor)
         {
-            if (descriptor == null)
+            if (descriptor is null)
             {
                 throw new ArgumentNullException(nameof(descriptor));
             }
@@ -152,7 +152,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         protected CreatedResult Created(string uri, object value)
         {
-            if (uri == null)
+            if (uri is null)
             {
                 throw new ArgumentNullException(nameof(uri));
             }
@@ -162,7 +162,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         protected CreatedResult Created(Uri uri, object value)
         {
-            if (uri == null)
+            if (uri is null)
             {
                 throw new ArgumentNullException(nameof(uri));
             }
@@ -181,7 +181,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         protected AcceptedResult Accepted(Uri uri)
         {
-            if (uri == null)
+            if (uri is null)
             {
                 throw new ArgumentNullException(nameof(uri));
             }
@@ -193,7 +193,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         protected AcceptedResult Accepted(Uri uri, object value)
         {
-            if (uri == null)
+            if (uri is null)
             {
                 throw new ArgumentNullException(nameof(uri));
             }
@@ -214,7 +214,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         protected IActionResult Proxy(string backendUri)
         {
-            if (backendUri == null)
+            if (backendUri is null)
             {
                 throw new ArgumentNullException(nameof(backendUri));
             }

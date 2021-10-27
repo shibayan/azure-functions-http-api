@@ -10,7 +10,7 @@ namespace Microsoft.Extensions.Hosting
     {
         public static IWebJobsBuilder AddHttpApi(this IWebJobsBuilder builder)
         {
-            if (builder == null)
+            if (builder is null)
             {
                 throw new ArgumentNullException(nameof(builder));
             }
