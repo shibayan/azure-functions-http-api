@@ -8,9 +8,6 @@ namespace Azure.WebJobs.Extensions.HttpApi
 {
     public class HttpApiWebJobsStartup : IWebJobsStartup
     {
-        public void Configure(IWebJobsBuilder builder)
-        {
-            builder.AddHttpApi();
-        }
+        public void Configure(IWebJobsBuilder builder) => builder.AddHttpApi();
     }
 }

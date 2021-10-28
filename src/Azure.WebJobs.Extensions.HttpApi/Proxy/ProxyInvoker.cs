@@ -107,9 +107,9 @@ namespace Azure.WebJobs.Extensions.HttpApi.Proxy
             }
         }
 
-        private readonly HttpClient _httpClient = new HttpClient();
+        private readonly HttpClient _httpClient = new();
 
-        private static readonly HashSet<string> _skipHeaders = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        private static readonly HashSet<string> _skipHeaders = new(StringComparer.OrdinalIgnoreCase)
         {
             "Host",
             "Connection",
