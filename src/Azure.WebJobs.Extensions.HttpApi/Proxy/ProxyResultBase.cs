@@ -16,7 +16,7 @@ namespace Azure.WebJobs.Extensions.HttpApi.Proxy
 
         private readonly string _backendUri;
 
-        private static readonly Regex _templateRegex = new Regex(@"\{([^\{\}]+)\}", RegexOptions.Compiled);
+        private static readonly Regex _templateRegex = new(@"\{([^\{\}]+)\}", RegexOptions.Compiled);
 
         public ProxyInvoker ProxyInvoker { get; set; }
 
@@ -46,7 +46,7 @@ namespace Azure.WebJobs.Extensions.HttpApi.Proxy
         {
             var routeValues = context.RouteData.Values;
 
-            var backend = _templateRegex.Replace(_backendUri, match =>
+            return _templateRegex.Replace(_backendUri, match =>
             {
                 if (routeValues.TryGetValue(match.Groups[1].Value, out var value) && value != null)
                 {
@@ -55,8 +55,6 @@ namespace Azure.WebJobs.Extensions.HttpApi.Proxy
 
                 return "";
             });
-
-            return backend;
         }
     }
 }

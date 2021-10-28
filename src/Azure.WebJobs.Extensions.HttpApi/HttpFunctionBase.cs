@@ -37,9 +37,9 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         private const string DefaultContentType = "application/octet-stream";
 
-        private static readonly IFileProvider _fileProvider = new PhysicalFileProvider(FunctionEnvironment.RootPath);
-        private static readonly IContentTypeProvider _contentTypeProvider = new FileExtensionContentTypeProvider();
-        private static readonly ProxyInvoker _proxyInvoker = new ProxyInvoker();
+        private static readonly PhysicalFileProvider _fileProvider = new(FunctionEnvironment.RootPath);
+        private static readonly FileExtensionContentTypeProvider _contentTypeProvider = new();
+        private static readonly ProxyInvoker _proxyInvoker = new();
 
         protected HttpContext HttpContext => _httpContextAccessor.HttpContext;
         protected HttpRequest Request => HttpContext?.Request;
@@ -70,8 +70,8 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         #region IActionResult helpers
 
-        protected StatusCodeResult StatusCode(int statusCode) => new StatusCodeResult(statusCode);
-        protected ObjectResult StatusCode(int statusCode, object value) => new ObjectResult(value) { StatusCode = statusCode };
+        protected StatusCodeResult StatusCode(int statusCode) => new(statusCode);
+        protected ObjectResult StatusCode(int statusCode, object value) => new(value) { StatusCode = statusCode };
 
         protected ContentResult Content(string content) => Content(content, (MediaTypeHeaderValue)null);
         protected ContentResult Content(string content, string contentType) => Content(content, MediaTypeHeaderValue.Parse(contentType));
@@ -84,24 +84,25 @@ namespace Azure.WebJobs.Extensions.HttpApi
         }
 
         protected ContentResult Content(string content, MediaTypeHeaderValue contentType)
-            => new ContentResult { Content = content, ContentType = contentType?.ToString() };
+            => new()
+            { Content = content, ContentType = contentType?.ToString() };
 
-        protected NoContentResult NoContent() => new NoContentResult();
+        protected NoContentResult NoContent() => new();
 
-        protected OkResult Ok() => new OkResult();
-        protected OkObjectResult Ok(object value) => new OkObjectResult(value);
+        protected OkResult Ok() => new();
+        protected OkObjectResult Ok(object value) => new(value);
 
         protected FileContentResult File(byte[] fileContents, string contentType)
             => File(fileContents, contentType, null);
 
         protected FileContentResult File(byte[] fileContents, string contentType, string fileDownloadName)
-            => new FileContentResult(fileContents, contentType) { FileDownloadName = fileDownloadName };
+            => new(fileContents, contentType) { FileDownloadName = fileDownloadName };
 
         protected FileStreamResult File(Stream fileStream, string contentType)
             => File(fileStream, contentType, null);
 
         protected FileStreamResult File(Stream fileStream, string contentType, string fileDownloadName)
-            => new FileStreamResult(fileStream, contentType) { FileDownloadName = fileDownloadName };
+            => new(fileStream, contentType) { FileDownloadName = fileDownloadName };
 
         protected VirtualFileResult File(string virtualPath)
             => File(virtualPath, _contentTypeProvider.TryGetContentType(virtualPath, out var contentType) ? contentType : DefaultContentType);
@@ -110,21 +111,21 @@ namespace Azure.WebJobs.Extensions.HttpApi
             => File(virtualPath, contentType, null);
 
         protected VirtualFileResult File(string virtualPath, string contentType, string fileDownloadName)
-            => new VirtualFileResult(virtualPath, contentType) { FileDownloadName = fileDownloadName, FileProvider = _fileProvider };
+            => new(virtualPath, contentType) { FileDownloadName = fileDownloadName, FileProvider = _fileProvider };
 
-        protected UnauthorizedResult Unauthorized() => new UnauthorizedResult();
-        protected UnauthorizedObjectResult Unauthorized(object value) => new UnauthorizedObjectResult(value);
+        protected UnauthorizedResult Unauthorized() => new();
+        protected UnauthorizedObjectResult Unauthorized(object value) => new(value);
 
-        protected NotFoundResult NotFound() => new NotFoundResult();
-        protected NotFoundObjectResult NotFound(object value) => new NotFoundObjectResult(value);
+        protected NotFoundResult NotFound() => new();
+        protected NotFoundObjectResult NotFound(object value) => new(value);
 
-        protected BadRequestResult BadRequest() => new BadRequestResult();
-        protected BadRequestObjectResult BadRequest(object error) => new BadRequestObjectResult(error);
-        protected BadRequestObjectResult BadRequest(ModelStateDictionary modelState) => new BadRequestObjectResult(modelState);
+        protected BadRequestResult BadRequest() => new();
+        protected BadRequestObjectResult BadRequest(object error) => new(error);
+        protected BadRequestObjectResult BadRequest(ModelStateDictionary modelState) => new(modelState);
 
-        protected ConflictResult Conflict() => new ConflictResult();
-        protected ConflictObjectResult Conflict(object error) => new ConflictObjectResult(error);
-        protected ConflictObjectResult Conflict(ModelStateDictionary modelState) => new ConflictObjectResult(modelState);
+        protected ConflictResult Conflict() => new();
+        protected ConflictObjectResult Conflict(object error) => new(error);
+        protected ConflictObjectResult Conflict(ModelStateDictionary modelState) => new(modelState);
 
         protected ObjectResult Problem(string detail = null, string instance = null, int? statusCode = null, string title = null, string type = null)
         {
@@ -178,8 +179,8 @@ namespace Azure.WebJobs.Extensions.HttpApi
         protected CreatedResult CreatedAtFunction(string functionName, object routeValues, object value)
             => Created(Url.Link(functionName, routeValues), value);
 
-        protected AcceptedResult Accepted() => new AcceptedResult();
-        protected AcceptedResult Accepted(object value) => new AcceptedResult(location: null, value);
+        protected AcceptedResult Accepted() => new();
+        protected AcceptedResult Accepted(object value) => new(location: null, value);
 
         protected AcceptedResult Accepted(Uri uri)
         {
@@ -191,7 +192,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
             return new AcceptedResult(uri, null);
         }
 
-        protected AcceptedResult Accepted(string uri) => new AcceptedResult(uri, null);
+        protected AcceptedResult Accepted(string uri) => new(uri, null);
 
         protected AcceptedResult Accepted(Uri uri, object value)
         {
@@ -203,7 +204,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
             return new AcceptedResult(uri, value);
         }
 
-        protected AcceptedResult Accepted(string uri, object value) => new AcceptedResult(uri, value);
+        protected AcceptedResult Accepted(string uri, object value) => new(uri, value);
 
         protected AcceptedResult AcceptedAtFunction(string functionName) => AcceptedAtFunction(functionName, null, null);
         protected AcceptedResult AcceptedAtFunction(string functionName, object value) => AcceptedAtFunction(functionName, null, value);
