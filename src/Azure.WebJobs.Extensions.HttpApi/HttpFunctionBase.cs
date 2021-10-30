@@ -84,8 +84,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
         }
 
         protected ContentResult Content(string content, MediaTypeHeaderValue contentType)
-            => new()
-            { Content = content, ContentType = contentType?.ToString() };
+            => new() { Content = content, ContentType = contentType?.ToString() };
 
         protected NoContentResult NoContent() => new();
 
@@ -225,14 +224,29 @@ namespace Azure.WebJobs.Extensions.HttpApi
             return new ProxyResult(backendUri) { ProxyInvoker = _proxyInvoker, Before = before, After = after };
         }
 
-        protected IActionResult StaticWebsite(string backendUri, string fallbackExclude = null)
+        protected IActionResult ProxySpa(string backendUri, string fallbackExclude = null)
         {
             if (backendUri is null)
             {
                 throw new ArgumentNullException(nameof(backendUri));
             }
 
-            return new StaticWebsiteResult(backendUri) { ProxyInvoker = _proxyInvoker, FallbackExclude = fallbackExclude };
+            return new ProxySpaResult(backendUri) { ProxyInvoker = _proxyInvoker, FallbackExclude = fallbackExclude };
+        }
+
+        protected VirtualFileResult ServeSpa(string virtualPath, string fallbackExclude = null)
+        {
+            if (virtualPath is null)
+            {
+                throw new ArgumentNullException(nameof(virtualPath));
+            }
+
+            if (!_contentTypeProvider.TryGetContentType(virtualPath, out var contentType))
+            {
+                contentType = DefaultContentType;
+            }
+
+            return new VirtualFileResult(virtualPath, contentType) { FileProvider = _fileProvider };
         }
 
         #endregion

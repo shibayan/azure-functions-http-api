@@ -19,7 +19,7 @@ namespace ProxySample
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "put", "delete", "options", "head", "patch", Route = "{*path}")]
             HttpRequest req)
         {
-            return StaticWebsite("https://ststaticwebsiteproxy.z11.web.core.windows.net/{path}", fallbackExclude: $"^/_nuxt/.*");
+            return ProxySpa("https://ststaticwebsiteproxy.z11.web.core.windows.net/{path}", fallbackExclude: $"^/_nuxt/.*");
         }
     }
 }

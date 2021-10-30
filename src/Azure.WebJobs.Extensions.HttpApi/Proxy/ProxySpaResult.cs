@@ -4,9 +4,9 @@ using System.Text.RegularExpressions;
 
 namespace Azure.WebJobs.Extensions.HttpApi.Proxy
 {
-    internal class StaticWebsiteResult : ProxyResultBase
+    internal class ProxySpaResult : ProxyResultBase
     {
-        public StaticWebsiteResult(string backendUri)
+        public ProxySpaResult(string backendUri)
             : base(backendUri)
         {
         }
