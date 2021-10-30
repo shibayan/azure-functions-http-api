@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -27,7 +28,7 @@ namespace Azure.WebJobs.Extensions.HttpApi.Proxy
 
             before?.Invoke(request);
 
-            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, httpContext.RequestAborted);
+            var response = await _httpClient.SendAsync(request, httpContext.RequestAborted);
 
             after?.Invoke(response);
 
@@ -107,7 +108,13 @@ namespace Azure.WebJobs.Extensions.HttpApi.Proxy
             }
         }
 
-        private readonly HttpClient _httpClient = new();
+        private readonly HttpMessageInvoker _httpClient = new(new SocketsHttpHandler
+        {
+            AllowAutoRedirect = false,
+            AutomaticDecompression = DecompressionMethods.None,
+            UseCookies = false,
+            UseProxy = false
+        });
 
         private static readonly HashSet<string> _skipHeaders = new(StringComparer.OrdinalIgnoreCase)
         {
