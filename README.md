@@ -11,6 +11,7 @@
 - ASP.NET Core like helpers
 - Support URL generation
 - Handle static files
+- Reverse proxy
 
 ## Basic usage
 
@@ -112,6 +113,26 @@ public class Function1 : HttpFunctionBase
         ILogger log)
     {
         return File("sample.html");
+    }
+}
+```
+
+### Reverse proxy
+
+```csharp
+public class Function1 : HttpFunctionBase
+{
+    public Function1(IHttpContextAccessor httpContextAccessor)
+        : base(httpContextAccessor)
+    {
+    }
+
+    [FunctionName("Function1")]
+    public IActionResult Run(
+        [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "{*path}"})] HttpRequest req,
+        ILogger log)
+    {
+        return Proxy("https://example.com/{path}");
     }
 }
 ```
