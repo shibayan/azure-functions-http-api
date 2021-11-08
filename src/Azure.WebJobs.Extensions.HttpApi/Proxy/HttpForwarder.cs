@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Azure.WebJobs.Extensions.HttpApi.Proxy
 {
-    internal class ProxyInvoker
+    internal class HttpForwarder
     {
         public async Task SendAsync(string destinationUri, HttpContext httpContext, Action<HttpRequestMessage> before = null, Action<HttpResponseMessage> after = null)
         {

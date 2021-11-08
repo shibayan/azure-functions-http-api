@@ -3,6 +3,7 @@ using System.IO;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
 
 using Azure.WebJobs.Extensions.HttpApi.Internal;
 using Azure.WebJobs.Extensions.HttpApi.Proxy;
@@ -39,7 +40,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         private static readonly PhysicalFileProvider _fileProvider = new(FunctionEnvironment.RootPath);
         private static readonly FileExtensionContentTypeProvider _contentTypeProvider = new();
-        private static readonly ProxyInvoker _proxyInvoker = new();
+        private static readonly HttpForwarder _httpForwarder = new();
 
         protected HttpContext HttpContext => _httpContextAccessor.HttpContext;
         protected HttpRequest Request => HttpContext?.Request;
@@ -221,7 +222,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
                 throw new ArgumentNullException(nameof(backendUri));
             }
 
-            return new ProxyResult(backendUri) { ProxyInvoker = _proxyInvoker, Before = before, After = after };
+            return new ProxyResult(backendUri) { HttpForwarder = _httpForwarder, Before = before, After = after };
         }
 
         protected IActionResult ProxySpa(string backendUri, string fallbackExclude = null)
@@ -231,14 +232,24 @@ namespace Azure.WebJobs.Extensions.HttpApi
                 throw new ArgumentNullException(nameof(backendUri));
             }
 
-            return new ProxySpaResult(backendUri) { ProxyInvoker = _proxyInvoker, FallbackExclude = fallbackExclude };
+            return new ProxySpaResult(backendUri) { HttpForwarder = _httpForwarder, FallbackExclude = fallbackExclude };
         }
 
-        protected VirtualFileResult ServeSpa(string virtualPath, string fallbackExclude = null)
+        protected VirtualFileResult ServeSpa(string virtualPath, string fallbackPath = null, string fallbackExclude = null)
         {
             if (virtualPath is null)
             {
                 throw new ArgumentNullException(nameof(virtualPath));
+            }
+
+            var fileInfo = _fileProvider.GetFileInfo(virtualPath);
+
+            if (!fileInfo.Exists && !string.IsNullOrEmpty(fallbackPath))
+            {
+                if (string.IsNullOrEmpty(fallbackExclude) || !Regex.IsMatch(virtualPath, fallbackExclude))
+                {
+                    virtualPath = fallbackPath;
+                }
             }
 
             if (!_contentTypeProvider.TryGetContentType(virtualPath, out var contentType))

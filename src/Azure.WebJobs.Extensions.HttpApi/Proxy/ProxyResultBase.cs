@@ -18,7 +18,7 @@ namespace Azure.WebJobs.Extensions.HttpApi.Proxy
 
         private static readonly Regex _templateRegex = new(@"\{([^\{\}]+)\}", RegexOptions.Compiled);
 
-        public ProxyInvoker ProxyInvoker { get; set; }
+        public HttpForwarder HttpForwarder { get; set; }
 
         public async Task ExecuteResultAsync(ActionContext context)
         {
@@ -26,7 +26,7 @@ namespace Azure.WebJobs.Extensions.HttpApi.Proxy
             {
                 var backendUri = MakeBackendUri(context);
 
-                await ProxyInvoker.SendAsync(backendUri, context.HttpContext, BeforeSend, AfterSend);
+                await HttpForwarder.SendAsync(backendUri, context.HttpContext, BeforeSend, AfterSend);
             }
             catch
             {
