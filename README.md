@@ -7,13 +7,44 @@
 
 ## Features
 
+- Better route precedence
 - Model validation
 - ASP.NET Core like helpers
 - Support URL generation
 - Handle static files
-- Reverse proxy
+- Simple reverse proxy
+- Streamlined SPA / SSG hosting
 
-## Basic usage
+## Installation
+
+## Examples
+
+```
+Install-Package WebJobs.Extensions.HttpApi
+```
+
+```
+dotnet add package WebJobs.Extensions.HttpApi
+```
+
+```csharp
+// Inherits from `HttpFunctionBase` class
+public class Function1 : HttpFunctionBase
+{
+    public Function1(IHttpContextAccessor httpContextAccessor)
+        : base(httpContextAccessor)
+    {
+    }
+
+    [FunctionName("Function1")]
+    public IActionResult Run(
+        [HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req,
+        ILogger log)
+    {
+        return Ok($"Hello, {req.Query["name"]}");
+    }
+}
+```
 
 ### Model validation
 
@@ -117,7 +148,7 @@ public class Function1 : HttpFunctionBase
 }
 ```
 
-### Reverse proxy
+### Simple reverse proxy
 
 ```csharp
 public class Function1 : HttpFunctionBase
@@ -133,6 +164,26 @@ public class Function1 : HttpFunctionBase
         ILogger log)
     {
         return Proxy("https://example.com/{path}");
+    }
+}
+```
+
+### Streamlined SPA / SSG hosting
+
+```csharp
+public class Function1 : HttpFunctionBase
+{
+    public Function1(IHttpContextAccessor httpContextAccessor)
+        : base(httpContextAccessor)
+    {
+    }
+
+    [FunctionName("Function1")]
+    public IActionResult Run(
+        [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "{*path}"})] HttpRequest req,
+        ILogger log)
+    {
+        return ProxySpa("https://example.com/{path}", fallbackExclude: $"^/_nuxt/.*");
     }
 }
 ```
