@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebsiteSample", "WebsiteSample.csproj", "{7A3F07D7-739E-4595-A488-A1D06B4FF666}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Azure.WebJobs.Extensions.HttpApi", "..\..\src\Azure.WebJobs.Extensions.HttpApi\Azure.WebJobs.Extensions.HttpApi.csproj", "{B05F72AB-0142-47D8-A89C-C7D5A580C154}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7A3F07D7-739E-4595-A488-A1D06B4FF666}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A3F07D7-739E-4595-A488-A1D06B4FF666}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A3F07D7-739E-4595-A488-A1D06B4FF666}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A3F07D7-739E-4595-A488-A1D06B4FF666}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B05F72AB-0142-47D8-A89C-C7D5A580C154}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B05F72AB-0142-47D8-A89C-C7D5A580C154}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B05F72AB-0142-47D8-A89C-C7D5A580C154}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B05F72AB-0142-47D8-A89C-C7D5A580C154}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7C2B4AE4-3B76-44F6-948E-0F39D216DB67}
+	EndGlobalSection
+EndGlobal

@@ -235,29 +235,56 @@ namespace Azure.WebJobs.Extensions.HttpApi
             return new ProxySpaResult(backendUri) { HttpForwarder = _httpForwarder, FallbackExclude = fallbackExclude };
         }
 
-        protected VirtualFileResult ServeSpa(string virtualPath, string fallbackPath = null, string fallbackExclude = null)
+        protected IActionResult ServeSpa(string virtualPath, string contentRoot = "wwwroot", string defaultFile = "index.html", string fallbackPath = "404.html", string fallbackExclude = null)
         {
-            if (virtualPath is null)
+            if (contentRoot is null)
             {
-                throw new ArgumentNullException(nameof(virtualPath));
+                throw new ArgumentNullException(nameof(contentRoot));
             }
 
-            var fileInfo = _fileProvider.GetFileInfo(virtualPath);
-
-            if (!fileInfo.Exists && !string.IsNullOrEmpty(fallbackPath))
+            if (virtualPath is null)
             {
-                if (string.IsNullOrEmpty(fallbackExclude) || !Regex.IsMatch(virtualPath, fallbackExclude))
+                virtualPath = "/";
+            }
+            else if (!virtualPath.StartsWith("/"))
+            {
+                virtualPath = "/" + virtualPath;
+            }
+
+            var subDir = _fileProvider.GetDirectoryContents(contentRoot + virtualPath);
+
+            if (subDir.Exists)
+            {
+                virtualPath += defaultFile;
+            }
+
+            var fileInfo = _fileProvider.GetFileInfo(contentRoot + virtualPath);
+
+            if (!fileInfo.Exists)
+            {
+                if (!string.IsNullOrEmpty(fallbackPath) && (string.IsNullOrEmpty(fallbackExclude) || !Regex.IsMatch(virtualPath, fallbackExclude)))
                 {
-                    virtualPath = fallbackPath;
+                    virtualPath = "/" + fallbackPath;
+
+                    var fallbackFileInfo = _fileProvider.GetFileInfo(contentRoot + virtualPath);
+
+                    if (!fallbackFileInfo.Exists)
+                    {
+                        return NotFound();
+                    }
+                }
+                else
+                {
+                    return NotFound();
                 }
             }
 
-            if (!_contentTypeProvider.TryGetContentType(virtualPath, out var contentType))
+            if (!_contentTypeProvider.TryGetContentType(contentRoot + virtualPath, out var contentType))
             {
                 contentType = DefaultContentType;
             }
 
-            return new VirtualFileResult(virtualPath, contentType) { FileProvider = _fileProvider };
+            return new VirtualFileResult(contentRoot + virtualPath, contentType) { FileProvider = _fileProvider };
         }
 
         #endregion
