@@ -183,7 +183,11 @@ public class Function1 : HttpFunctionBase
         [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "{*path}"})] HttpRequest req,
         ILogger log)
     {
-        return ProxySpa("https://example.com/{path}", fallbackExclude: $"^/_nuxt/.*");
+#if USE_PROXY
+        return ProxyStaticApp("https://example.com/{path}", fallbackExclude: $"^/_nuxt/.*");
+#else
+        return LocalStaticApp($"{path}", fallbackExclude: $"^/_nuxt/.*");
+#endif
     }
 }
 ```
