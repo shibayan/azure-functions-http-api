@@ -3,7 +3,6 @@ using System.IO;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
-using System.Text.RegularExpressions;
 
 using Azure.WebJobs.Extensions.HttpApi.Internal;
 using Azure.WebJobs.Extensions.HttpApi.Proxy;
@@ -214,76 +213,29 @@ namespace Azure.WebJobs.Extensions.HttpApi
         protected StatusCodeResult Forbid() => StatusCode(StatusCodes.Status403Forbidden);
         protected ObjectResult Forbid(object value) => StatusCode(StatusCodes.Status403Forbidden, value);
 
-        protected IActionResult Proxy(string backendUri, Action<HttpRequestMessage> before = null, Action<HttpResponseMessage> after = null)
+        protected IActionResult Proxy(string backendUri, Action<HttpRequestMessage> beforeSend = null, Action<HttpResponseMessage> afterSend = null)
         {
             if (backendUri is null)
             {
                 throw new ArgumentNullException(nameof(backendUri));
             }
 
-            return new ProxyResult(backendUri) { Before = before, After = after };
+            return new ProxyResult(backendUri) { BeforeSend = beforeSend, AfterSend = afterSend };
         }
 
-        protected IActionResult ProxySpa(string backendUri, string fallbackExclude = null)
+        protected IActionResult ProxyStaticApp(string backendUri, string fallbackExclude = null)
         {
             if (backendUri is null)
             {
                 throw new ArgumentNullException(nameof(backendUri));
             }
 
-            return new ProxySpaResult(backendUri) { FallbackExclude = fallbackExclude };
+            return new ProxyStaticAppResult(backendUri) { FallbackExclude = fallbackExclude };
         }
 
-        protected IActionResult ServeSpa(string virtualPath, string contentRoot = "wwwroot", string defaultFile = "index.html", string fallbackPath = "404.html", string fallbackExclude = null)
+        protected IActionResult LocalStaticApp(string virtualPath, string defaultFile = "index.html", string fallbackPath = "404.html", string fallbackExclude = null)
         {
-            if (contentRoot is null)
-            {
-                throw new ArgumentNullException(nameof(contentRoot));
-            }
-
-            if (virtualPath is null)
-            {
-                virtualPath = "/";
-            }
-            else if (!virtualPath.StartsWith("/"))
-            {
-                virtualPath = "/" + virtualPath;
-            }
-
-            var subDir = _fileProvider.GetDirectoryContents(contentRoot + virtualPath);
-
-            if (subDir.Exists)
-            {
-                virtualPath += defaultFile;
-            }
-
-            var fileInfo = _fileProvider.GetFileInfo(contentRoot + virtualPath);
-
-            if (!fileInfo.Exists)
-            {
-                if (!string.IsNullOrEmpty(fallbackPath) && (string.IsNullOrEmpty(fallbackExclude) || !Regex.IsMatch(virtualPath, fallbackExclude)))
-                {
-                    virtualPath = "/" + fallbackPath;
-
-                    var fallbackFileInfo = _fileProvider.GetFileInfo(contentRoot + virtualPath);
-
-                    if (!fallbackFileInfo.Exists)
-                    {
-                        return NotFound();
-                    }
-                }
-                else
-                {
-                    return NotFound();
-                }
-            }
-
-            if (!_contentTypeProvider.TryGetContentType(contentRoot + virtualPath, out var contentType))
-            {
-                contentType = DefaultContentType;
-            }
-
-            return new VirtualFileResult(contentRoot + virtualPath, contentType) { FileProvider = _fileProvider };
+            return new LocalStaticAppResult(virtualPath) { DefaultFile = defaultFile, FallbackPath = fallbackPath, FallbackExclude = fallbackExclude };
         }
 
         #endregion

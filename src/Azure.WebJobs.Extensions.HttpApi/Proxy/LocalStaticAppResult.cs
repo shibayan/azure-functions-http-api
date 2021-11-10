@@ -5,9 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Azure.WebJobs.Extensions.HttpApi.Proxy
 {
-    internal class StaticFileResult : IActionResult
+    internal class LocalStaticAppResult : IActionResult
     {
-        public string ContentRoot { get; set; }
+        public LocalStaticAppResult(string virtualPath)
+        {
+            VirtualPath = virtualPath;
+        }
+
+        public string VirtualPath { get; set; }
 
         public string DefaultFile { get; set; }
 
@@ -15,7 +20,7 @@ namespace Azure.WebJobs.Extensions.HttpApi.Proxy
 
         public string FallbackExclude { get; set; }
 
-        private static readonly StaticFileResultExecutor _executor = new();
+        private static readonly LocalStaticAppResultExecutor _executor = new();
 
         public Task ExecuteResultAsync(ActionContext context)
         {

@@ -15,9 +15,9 @@ namespace Azure.WebJobs.Extensions.HttpApi.Proxy
 
         public string BackendUri { get; }
 
-        public Action<HttpRequestMessage> Before { get; set; }
+        public Action<HttpRequestMessage> BeforeSend { get; set; }
 
-        public Action<HttpResponseMessage> After { get; set; }
+        public Action<HttpResponseMessage> AfterSend { get; set; }
 
         private static ProxyResultExecutor _executor = new();
 

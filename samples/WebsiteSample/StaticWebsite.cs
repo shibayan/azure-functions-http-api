@@ -20,9 +20,9 @@ namespace WebsiteSample
             HttpRequest req,
             string path)
         {
-            //return ProxySpa("https://ststaticwebsiteproxy.z11.web.core.windows.net/{path}", fallbackExclude: $"^/_nuxt/.*");
+            //return ProxyStaticApp("https://ststaticwebsiteproxy.z11.web.core.windows.net/{path}", fallbackExclude: $"^/_nuxt/.*");
 
-            return ServeSpa(path, fallbackPath: "200.html", fallbackExclude: $"^/_nuxt/.*");
+            return LocalStaticApp(path, fallbackPath: "200.html", fallbackExclude: $"^/_nuxt/.*");
         }
     }
 }

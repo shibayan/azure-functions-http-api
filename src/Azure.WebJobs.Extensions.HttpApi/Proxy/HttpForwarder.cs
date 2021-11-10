@@ -11,7 +11,7 @@ namespace Azure.WebJobs.Extensions.HttpApi.Proxy
 {
     internal class HttpForwarder
     {
-        public async Task SendAsync(string destinationUri, HttpContext httpContext, Action<HttpRequestMessage> before = null, Action<HttpResponseMessage> after = null)
+        public async Task SendAsync(string destinationUri, HttpContext httpContext, Action<HttpRequestMessage> beforeSend = null, Action<HttpResponseMessage> afterSend = null)
         {
             var request = new HttpRequestMessage
             {
@@ -26,11 +26,11 @@ namespace Azure.WebJobs.Extensions.HttpApi.Proxy
                 request.Content = new StreamContent(httpContext.Request.Body);
             }
 
-            before?.Invoke(request);
+            beforeSend?.Invoke(request);
 
             var response = await _httpClient.SendAsync(request, httpContext.RequestAborted);
 
-            after?.Invoke(response);
+            afterSend?.Invoke(response);
 
             httpContext.Response.StatusCode = (int)response.StatusCode;
 

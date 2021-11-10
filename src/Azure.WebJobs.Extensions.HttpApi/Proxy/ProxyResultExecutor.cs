@@ -18,7 +18,7 @@ namespace Azure.WebJobs.Extensions.HttpApi.Proxy
             {
                 var backendUri = MakeBackendUri(result.BackendUri, context);
 
-                await _httpForwarder.SendAsync(backendUri, context.HttpContext, result.Before, result.After);
+                await _httpForwarder.SendAsync(backendUri, context.HttpContext, result.BeforeSend, result.AfterSend);
             }
             catch
             {
