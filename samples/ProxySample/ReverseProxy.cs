@@ -19,7 +19,7 @@ namespace ProxySample
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "put", "delete", "options", "head", "patch", Route = "{*path}")]
             HttpRequest req)
         {
-            return Proxy("https://shibayan.jp/{path}");
+            return Proxy("https://shibayan.jp");
         }
     }
 }

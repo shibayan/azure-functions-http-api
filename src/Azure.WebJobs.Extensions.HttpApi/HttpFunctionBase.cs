@@ -233,9 +233,9 @@ namespace Azure.WebJobs.Extensions.HttpApi
             return new ProxyStaticAppResult(backendUri) { FallbackExclude = fallbackExclude };
         }
 
-        protected IActionResult LocalStaticApp(string virtualPath, string defaultFile = "index.html", string fallbackPath = "404.html", string fallbackExclude = null)
+        protected IActionResult LocalStaticApp(string defaultFile = "index.html", string fallbackPath = "404.html", string fallbackExclude = null)
         {
-            return new LocalStaticAppResult(virtualPath) { DefaultFile = defaultFile, FallbackPath = fallbackPath, FallbackExclude = fallbackExclude };
+            return new LocalStaticAppResult { DefaultFile = defaultFile, FallbackPath = fallbackPath, FallbackExclude = fallbackExclude };
         }
 
         #endregion

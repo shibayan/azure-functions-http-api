@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -30,15 +31,16 @@ namespace Azure.WebJobs.Extensions.HttpApi.Proxy
         {
             var routeValues = context.RouteData.Values;
 
-            return _templateRegex.Replace(backendUri, match =>
-            {
-                if (routeValues.TryGetValue(match.Groups[1].Value, out var value) && value != null)
-                {
-                    return value.ToString();
-                }
+            var generatedBackendUri = _templateRegex.Replace(backendUri, m => routeValues[m.Groups[1].Value]?.ToString() ?? "");
 
-                return "";
-            });
+            if (generatedBackendUri == backendUri)
+            {
+                var (_, value) = routeValues.Single();
+
+                generatedBackendUri += generatedBackendUri.EndsWith("/") ? value : $"/{value}";
+            }
+
+            return generatedBackendUri;
         }
     }
 }
