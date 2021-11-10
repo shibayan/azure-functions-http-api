@@ -4,8 +4,8 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 
+using Azure.WebJobs.Extensions.HttpApi.Core;
 using Azure.WebJobs.Extensions.HttpApi.Internal;
-using Azure.WebJobs.Extensions.HttpApi.Proxy;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -223,14 +223,14 @@ namespace Azure.WebJobs.Extensions.HttpApi
             return new ProxyResult(backendUri) { BeforeSend = beforeSend, AfterSend = afterSend };
         }
 
-        protected IActionResult ProxyStaticApp(string backendUri, string fallbackExclude = null)
+        protected IActionResult RemoteStaticApp(string backendUri, string fallbackExclude = null)
         {
             if (backendUri is null)
             {
                 throw new ArgumentNullException(nameof(backendUri));
             }
 
-            return new ProxyStaticAppResult(backendUri) { FallbackExclude = fallbackExclude };
+            return new RemoteStaticAppResult(backendUri) { FallbackExclude = fallbackExclude };
         }
 
         protected IActionResult LocalStaticApp(string defaultFile = "index.html", string fallbackPath = "404.html", string fallbackExclude = null)

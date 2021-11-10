@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
 
-namespace Azure.WebJobs.Extensions.HttpApi.Proxy
+namespace Azure.WebJobs.Extensions.HttpApi.Internal
 {
     internal class HttpForwarder
     {

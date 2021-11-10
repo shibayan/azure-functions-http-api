@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 
-namespace Azure.WebJobs.Extensions.HttpApi.Proxy
+namespace Azure.WebJobs.Extensions.HttpApi.Core
 {
     internal class LocalStaticAppResultExecutor : IActionResultExecutor<LocalStaticAppResult>
     {

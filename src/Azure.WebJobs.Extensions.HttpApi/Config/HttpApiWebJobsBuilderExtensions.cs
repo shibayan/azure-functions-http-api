@@ -4,7 +4,7 @@ using Azure.WebJobs.Extensions.HttpApi.Routing;
 
 using Microsoft.Azure.WebJobs;
 
-namespace Microsoft.Extensions.Hosting
+namespace Azure.WebJobs.Extensions.HttpApi.Config
 {
     public static class HttpApiWebJobsBuilderExtensions
     {

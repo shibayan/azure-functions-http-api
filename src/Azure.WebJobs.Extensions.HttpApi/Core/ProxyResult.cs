@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Mvc;
 
-namespace Azure.WebJobs.Extensions.HttpApi.Proxy
+namespace Azure.WebJobs.Extensions.HttpApi.Core
 {
     internal class ProxyResult : IActionResult
     {

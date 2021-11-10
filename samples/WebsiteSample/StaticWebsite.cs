@@ -19,7 +19,7 @@ namespace WebsiteSample
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "put", "delete", "options", "head", "patch", Route = "{*path}")]
             HttpRequest req)
         {
-            //return ProxyStaticApp("https://ststaticwebsiteproxy.z11.web.core.windows.net", fallbackExclude: $"^/_nuxt/.*");
+            //return RemoteStaticApp("https://ststaticwebsiteproxy.z11.web.core.windows.net", fallbackExclude: $"^/_nuxt/.*");
 
             return LocalStaticApp(fallbackPath: "200.html", fallbackExclude: $"^/_nuxt/.*");
         }
