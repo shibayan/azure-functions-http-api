@@ -7,19 +7,19 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 
 namespace ProxySample
 {
-    public class StaticWebsite : HttpFunctionBase
+    public class ReverseProxy : HttpFunctionBase
     {
-        public StaticWebsite(IHttpContextAccessor httpContextAccessor)
+        public ReverseProxy(IHttpContextAccessor httpContextAccessor)
             : base(httpContextAccessor)
         {
         }
 
-        [FunctionName(nameof(StaticWebsite))]
+        [FunctionName(nameof(ReverseProxy))]
         public IActionResult Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "put", "delete", "options", "head", "patch", Route = "{*path}")]
             HttpRequest req)
         {
-            return ProxySpa("https://ststaticwebsiteproxy.z11.web.core.windows.net/{path}", fallbackExclude: $"^/_nuxt/.*");
+            return Proxy("https://shibayan.jp/{path}");
         }
     }
 }
