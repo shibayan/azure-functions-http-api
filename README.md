@@ -1,18 +1,50 @@
 # HTTP API Extensions for Azure Functions
 
 [![Build](https://github.com/shibayan/azure-functions-http-api/workflows/Build/badge.svg)](https://github.com/shibayan/azure-functions-http-api/actions/workflows/build.yml)
-[![Downloads](https://img.shields.io/nuget/dt/WebJobs.Extensions.HttpApi)](https://www.nuget.org/packages/WebJobs.Extensions.HttpApi/)
-[![NuGet](https://img.shields.io/nuget/v/WebJobs.Extensions.HttpApi)](https://www.nuget.org/packages/WebJobs.Extensions.HttpApi/)
-[![License](https://img.shields.io/github/license/shibayan/azure-functions-http-api)](https://github.com/shibayan/azure-functions-http-api/blob/master/LICENSE)
+[![Downloads](https://badgen.net/nuget/dt/WebJobs.Extensions.HttpApi)](https://www.nuget.org/packages/WebJobs.Extensions.HttpApi/)
+[![NuGet](https://badgen.net/nuget/v/WebJobs.Extensions.HttpApi)](https://www.nuget.org/packages/WebJobs.Extensions.HttpApi/)
+[![License](https://badgen.net/github/license/shibayan/azure-functions-http-api)](https://github.com/shibayan/azure-functions-http-api/blob/master/LICENSE)
 
 ## Features
 
+- Better route precedence
 - Model validation
 - ASP.NET Core like helpers
 - Support URL generation
 - Handle static files
+- Simple reverse proxy
+- Streamlined SPA / SSG hosting
 
-## Basic usage
+## Installation
+
+## Examples
+
+```
+Install-Package WebJobs.Extensions.HttpApi
+```
+
+```
+dotnet add package WebJobs.Extensions.HttpApi
+```
+
+```csharp
+// Inherits from `HttpFunctionBase` class
+public class Function1 : HttpFunctionBase
+{
+    public Function1(IHttpContextAccessor httpContextAccessor)
+        : base(httpContextAccessor)
+    {
+    }
+
+    [FunctionName("Function1")]
+    public IActionResult Run(
+        [HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req,
+        ILogger log)
+    {
+        return Ok($"Hello, {req.Query["name"]}");
+    }
+}
+```
 
 ### Model validation
 
@@ -112,6 +144,50 @@ public class Function1 : HttpFunctionBase
         ILogger log)
     {
         return File("sample.html");
+    }
+}
+```
+
+### Simple reverse proxy
+
+```csharp
+public class Function1 : HttpFunctionBase
+{
+    public Function1(IHttpContextAccessor httpContextAccessor)
+        : base(httpContextAccessor)
+    {
+    }
+
+    [FunctionName("Function1")]
+    public IActionResult Run(
+        [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "{*path}"})] HttpRequest req,
+        ILogger log)
+    {
+        return Proxy("https://example.com/{path}");
+    }
+}
+```
+
+### Streamlined SPA / SSG hosting
+
+```csharp
+public class Function1 : HttpFunctionBase
+{
+    public Function1(IHttpContextAccessor httpContextAccessor)
+        : base(httpContextAccessor)
+    {
+    }
+
+    [FunctionName("Function1")]
+    public IActionResult Run(
+        [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "{*path}"})] HttpRequest req,
+        ILogger log)
+    {
+#if USE_PROXY
+        return ProxyStaticApp("https://example.com/{path}", fallbackExclude: $"^/_nuxt/.*");
+#else
+        return LocalStaticApp($"{path}", fallbackExclude: $"^/_nuxt/.*");
+#endif
     }
 }
 ```

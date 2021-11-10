@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -8,9 +9,9 @@ using Microsoft.AspNetCore.Http;
 
 namespace Azure.WebJobs.Extensions.HttpApi.Proxy
 {
-    internal class ProxyInvoker
+    internal class HttpForwarder
     {
-        public async Task SendAsync(string destinationUri, HttpContext httpContext, Action<HttpRequestMessage> before = null, Action<HttpResponseMessage> after = null)
+        public async Task SendAsync(string destinationUri, HttpContext httpContext, Action<HttpRequestMessage> beforeSend = null, Action<HttpResponseMessage> afterSend = null)
         {
             var request = new HttpRequestMessage
             {
@@ -25,11 +26,11 @@ namespace Azure.WebJobs.Extensions.HttpApi.Proxy
                 request.Content = new StreamContent(httpContext.Request.Body);
             }
 
-            before?.Invoke(request);
+            beforeSend?.Invoke(request);
 
-            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, httpContext.RequestAborted);
+            var response = await _httpClient.SendAsync(request, httpContext.RequestAborted);
 
-            after?.Invoke(response);
+            afterSend?.Invoke(response);
 
             httpContext.Response.StatusCode = (int)response.StatusCode;
 
@@ -107,7 +108,13 @@ namespace Azure.WebJobs.Extensions.HttpApi.Proxy
             }
         }
 
-        private readonly HttpClient _httpClient = new();
+        private readonly HttpMessageInvoker _httpClient = new(new SocketsHttpHandler
+        {
+            AllowAutoRedirect = false,
+            AutomaticDecompression = DecompressionMethods.None,
+            UseCookies = false,
+            UseProxy = false
+        });
 
         private static readonly HashSet<string> _skipHeaders = new(StringComparer.OrdinalIgnoreCase)
         {

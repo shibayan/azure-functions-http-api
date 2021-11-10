@@ -4,16 +4,17 @@ using System.Text.RegularExpressions;
 
 namespace Azure.WebJobs.Extensions.HttpApi.Proxy
 {
-    internal class StaticWebsiteResult : ProxyResultBase
+    internal class ProxyStaticAppResult : ProxyResult
     {
-        public StaticWebsiteResult(string backendUri)
+        public ProxyStaticAppResult(string backendUri)
             : base(backendUri)
         {
+            AfterSend = AfterSendInternal;
         }
 
         public string FallbackExclude { get; set; }
 
-        protected override void AfterSend(HttpResponseMessage response)
+        private void AfterSendInternal(HttpResponseMessage response)
         {
             var request = response.RequestMessage;
 

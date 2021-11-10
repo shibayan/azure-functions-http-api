@@ -39,7 +39,6 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         private static readonly PhysicalFileProvider _fileProvider = new(FunctionEnvironment.RootPath);
         private static readonly FileExtensionContentTypeProvider _contentTypeProvider = new();
-        private static readonly ProxyInvoker _proxyInvoker = new();
 
         protected HttpContext HttpContext => _httpContextAccessor.HttpContext;
         protected HttpRequest Request => HttpContext?.Request;
@@ -84,8 +83,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
         }
 
         protected ContentResult Content(string content, MediaTypeHeaderValue contentType)
-            => new()
-            { Content = content, ContentType = contentType?.ToString() };
+            => new() { Content = content, ContentType = contentType?.ToString() };
 
         protected NoContentResult NoContent() => new();
 
@@ -215,24 +213,29 @@ namespace Azure.WebJobs.Extensions.HttpApi
         protected StatusCodeResult Forbid() => StatusCode(StatusCodes.Status403Forbidden);
         protected ObjectResult Forbid(object value) => StatusCode(StatusCodes.Status403Forbidden, value);
 
-        protected IActionResult Proxy(string backendUri, Action<HttpRequestMessage> before = null, Action<HttpResponseMessage> after = null)
+        protected IActionResult Proxy(string backendUri, Action<HttpRequestMessage> beforeSend = null, Action<HttpResponseMessage> afterSend = null)
         {
             if (backendUri is null)
             {
                 throw new ArgumentNullException(nameof(backendUri));
             }
 
-            return new ProxyResult(backendUri) { ProxyInvoker = _proxyInvoker, Before = before, After = after };
+            return new ProxyResult(backendUri) { BeforeSend = beforeSend, AfterSend = afterSend };
         }
 
-        protected IActionResult StaticWebsite(string backendUri, string fallbackExclude = null)
+        protected IActionResult ProxyStaticApp(string backendUri, string fallbackExclude = null)
         {
             if (backendUri is null)
             {
                 throw new ArgumentNullException(nameof(backendUri));
             }
 
-            return new StaticWebsiteResult(backendUri) { ProxyInvoker = _proxyInvoker, FallbackExclude = fallbackExclude };
+            return new ProxyStaticAppResult(backendUri) { FallbackExclude = fallbackExclude };
+        }
+
+        protected IActionResult LocalStaticApp(string virtualPath, string defaultFile = "index.html", string fallbackPath = "404.html", string fallbackExclude = null)
+        {
+            return new LocalStaticAppResult(virtualPath) { DefaultFile = defaultFile, FallbackPath = fallbackPath, FallbackExclude = fallbackExclude };
         }
 
         #endregion

@@ -1,21 +1,34 @@
 ﻿using System;
 using System.Net.Http;
+using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Mvc;
 
 namespace Azure.WebJobs.Extensions.HttpApi.Proxy
 {
-    internal class ProxyResult : ProxyResultBase
+    internal class ProxyResult : IActionResult
     {
         public ProxyResult(string backendUri)
-            : base(backendUri)
         {
+            BackendUri = backendUri ?? throw new ArgumentNullException(nameof(backendUri));
         }
 
-        public Action<HttpRequestMessage> Before { get; set; }
+        public string BackendUri { get; }
 
-        public Action<HttpResponseMessage> After { get; set; }
+        public Action<HttpRequestMessage> BeforeSend { get; set; }
 
-        protected override void BeforeSend(HttpRequestMessage request) => Before?.Invoke(request);
+        public Action<HttpResponseMessage> AfterSend { get; set; }
 
-        protected override void AfterSend(HttpResponseMessage response) => After?.Invoke(response);
+        private static ProxyResultExecutor _executor = new();
+
+        public Task ExecuteResultAsync(ActionContext context)
+        {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            return _executor.ExecuteAsync(context, this);
+        }
     }
 }
