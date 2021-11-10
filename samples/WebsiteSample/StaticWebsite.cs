@@ -17,12 +17,11 @@ namespace WebsiteSample
         [FunctionName(nameof(StaticWebsite))]
         public IActionResult Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "put", "delete", "options", "head", "patch", Route = "{*path}")]
-            HttpRequest req,
-            string path)
+            HttpRequest req)
         {
-            //return ProxyStaticApp("https://ststaticwebsiteproxy.z11.web.core.windows.net/{path}", fallbackExclude: $"^/_nuxt/.*");
+            //return ProxyStaticApp("https://ststaticwebsiteproxy.z11.web.core.windows.net", fallbackExclude: $"^/_nuxt/.*");
 
-            return LocalStaticApp(path, fallbackPath: "200.html", fallbackExclude: $"^/_nuxt/.*");
+            return LocalStaticApp(fallbackPath: "200.html", fallbackExclude: $"^/_nuxt/.*");
         }
     }
 }

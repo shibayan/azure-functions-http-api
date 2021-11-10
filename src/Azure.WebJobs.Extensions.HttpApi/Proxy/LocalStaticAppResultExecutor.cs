@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -22,7 +23,9 @@ namespace Azure.WebJobs.Extensions.HttpApi.Proxy
 
         public async Task ExecuteAsync(ActionContext context, LocalStaticAppResult result)
         {
-            var virtualPath = result.VirtualPath ?? "/";
+            var (_, value) = context.RouteData.Values.Single();
+
+            var virtualPath = $"/{value?.ToString()}";
 
             var contents = _fileProvider.GetDirectoryContents(virtualPath);
 

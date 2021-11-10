@@ -7,13 +7,6 @@ namespace Azure.WebJobs.Extensions.HttpApi.Proxy
 {
     internal class LocalStaticAppResult : IActionResult
     {
-        public LocalStaticAppResult(string virtualPath)
-        {
-            VirtualPath = virtualPath;
-        }
-
-        public string VirtualPath { get; set; }
-
         public string DefaultFile { get; set; }
 
         public string FallbackPath { get; set; }

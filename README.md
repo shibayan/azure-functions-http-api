@@ -184,9 +184,9 @@ public class Function1 : HttpFunctionBase
         ILogger log)
     {
 #if USE_PROXY
-        return ProxyStaticApp("https://example.com/{path}", fallbackExclude: $"^/_nuxt/.*");
+        return ProxyStaticApp("https://example.com", fallbackExclude: $"^/_nuxt/.*");
 #else
-        return LocalStaticApp($"{path}", fallbackExclude: $"^/_nuxt/.*");
+        return LocalStaticApp(fallbackPath: "404.html", fallbackExclude: $"^/_nuxt/.*");
 #endif
     }
 }
