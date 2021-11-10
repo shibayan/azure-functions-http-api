@@ -2,11 +2,11 @@
 using System.Net.Http;
 using System.Text.RegularExpressions;
 
-namespace Azure.WebJobs.Extensions.HttpApi.Proxy
+namespace Azure.WebJobs.Extensions.HttpApi.Core
 {
-    internal class ProxyStaticAppResult : ProxyResult
+    internal class RemoteStaticAppResult : ProxyResult
     {
-        public ProxyStaticAppResult(string backendUri)
+        public RemoteStaticAppResult(string backendUri)
             : base(backendUri)
         {
             AfterSend = AfterSendInternal;

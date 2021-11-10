@@ -3,10 +3,12 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
+using Azure.WebJobs.Extensions.HttpApi.Internal;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 
-namespace Azure.WebJobs.Extensions.HttpApi.Proxy
+namespace Azure.WebJobs.Extensions.HttpApi.Core
 {
     internal class ProxyResultExecutor : IActionResultExecutor<ProxyResult>
     {

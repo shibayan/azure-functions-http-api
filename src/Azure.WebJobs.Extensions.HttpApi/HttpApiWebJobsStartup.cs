@@ -1,6 +1,7 @@
-﻿using Microsoft.Azure.WebJobs;
+﻿using Azure.WebJobs.Extensions.HttpApi.Config;
+
+using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
-using Microsoft.Extensions.Hosting;
 
 [assembly: WebJobsStartup(typeof(Azure.WebJobs.Extensions.HttpApi.HttpApiWebJobsStartup))]
 
