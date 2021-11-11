@@ -26,9 +26,6 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNETCORE_VERSION }}
 
-    - name: Install .NET format tool
-      run: dotnet tool update -g dotnet-format
-
     - name: Build project
       run: dotnet build -c Release
 
