@@ -17,8 +17,6 @@
 
 ## Installation
 
-## Examples
-
 ```
 Install-Package WebJobs.Extensions.HttpApi
 ```
@@ -45,6 +43,8 @@ public class Function1 : HttpFunctionBase
     }
 }
 ```
+
+## Examples
 
 ### Model validation
 
