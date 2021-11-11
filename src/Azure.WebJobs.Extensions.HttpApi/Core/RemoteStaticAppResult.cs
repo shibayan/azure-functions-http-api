@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Azure.WebJobs.Extensions.HttpApi.Core
 {
-    internal class RemoteStaticAppResult : ProxyResult
+    public class RemoteStaticAppResult : ProxyResult
     {
         public RemoteStaticAppResult(string backendUri)
             : base(backendUri)
