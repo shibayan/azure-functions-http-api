@@ -31,7 +31,7 @@ namespace Azure.WebJobs.Extensions.HttpApi.Core
 
             if (contents.Exists)
             {
-                virtualPath += result.DefaultFile;
+                virtualPath += virtualPath.EndsWith("/") ? result.DefaultFile : $"/{result.DefaultFile}";
             }
 
             var response = context.HttpContext.Response;
