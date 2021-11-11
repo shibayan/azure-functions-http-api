@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Azure.WebJobs.Extensions.HttpApi.Core
 {
-    internal class LocalStaticAppResult : IActionResult
+    public class LocalStaticAppResult : IActionResult
     {
         public string DefaultFile { get; set; }
 

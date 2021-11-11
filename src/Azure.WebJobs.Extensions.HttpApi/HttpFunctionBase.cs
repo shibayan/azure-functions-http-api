@@ -129,26 +129,26 @@ namespace Azure.WebJobs.Extensions.HttpApi
         {
             var problemDetails = ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode ?? 500, title, type, detail, instance);
 
-            return new ObjectResult(problemDetails) { StatusCode = problemDetails.Status };
+            return new(problemDetails) { StatusCode = problemDetails.Status };
         }
 
-        protected ActionResult ValidationProblem(ValidationProblemDetails descriptor)
+        protected BadRequestObjectResult ValidationProblem(ValidationProblemDetails descriptor)
         {
             if (descriptor is null)
             {
                 throw new ArgumentNullException(nameof(descriptor));
             }
 
-            return new BadRequestObjectResult(descriptor);
+            return new(descriptor);
         }
 
-        protected ActionResult ValidationProblem(ModelStateDictionary modelState) => ValidationProblem(modelStateDictionary: modelState);
+        protected ObjectResult ValidationProblem(ModelStateDictionary modelState) => ValidationProblem(modelStateDictionary: modelState);
 
         protected ObjectResult ValidationProblem(string detail = null, string instance = null, int? statusCode = null, string title = null, string type = null, ModelStateDictionary modelStateDictionary = null)
         {
             var validationProblem = ProblemDetailsFactory.CreateValidationProblemDetails(HttpContext, modelStateDictionary ?? ModelState, statusCode, title, type, detail, instance);
 
-            return new ObjectResult(validationProblem) { StatusCode = validationProblem.Status };
+            return new(validationProblem) { StatusCode = validationProblem.Status };
         }
 
         protected CreatedResult Created(string uri, object value)
@@ -158,7 +158,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
                 throw new ArgumentNullException(nameof(uri));
             }
 
-            return new CreatedResult(uri, value);
+            return new(uri, value);
         }
 
         protected CreatedResult Created(Uri uri, object value)
@@ -168,7 +168,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
                 throw new ArgumentNullException(nameof(uri));
             }
 
-            return new CreatedResult(uri, value);
+            return new(uri, value);
         }
 
         protected CreatedResult CreatedAtFunction(string functionName) => CreatedAtFunction(functionName, null, null);
@@ -187,7 +187,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
                 throw new ArgumentNullException(nameof(uri));
             }
 
-            return new AcceptedResult(uri, null);
+            return new(uri, null);
         }
 
         protected AcceptedResult Accepted(string uri) => new(uri, null);
@@ -199,7 +199,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
                 throw new ArgumentNullException(nameof(uri));
             }
 
-            return new AcceptedResult(uri, value);
+            return new(uri, value);
         }
 
         protected AcceptedResult Accepted(string uri, object value) => new(uri, value);
@@ -213,29 +213,29 @@ namespace Azure.WebJobs.Extensions.HttpApi
         protected StatusCodeResult Forbid() => StatusCode(StatusCodes.Status403Forbidden);
         protected ObjectResult Forbid(object value) => StatusCode(StatusCodes.Status403Forbidden, value);
 
-        protected IActionResult Proxy(string backendUri, Action<HttpRequestMessage> beforeSend = null, Action<HttpResponseMessage> afterSend = null)
+        protected ProxyResult Proxy(string backendUri, Action<HttpRequestMessage> beforeSend = null, Action<HttpResponseMessage> afterSend = null)
         {
             if (backendUri is null)
             {
                 throw new ArgumentNullException(nameof(backendUri));
             }
 
-            return new ProxyResult(backendUri) { BeforeSend = beforeSend, AfterSend = afterSend };
+            return new(backendUri) { BeforeSend = beforeSend, AfterSend = afterSend };
         }
 
-        protected IActionResult RemoteStaticApp(string backendUri, string fallbackExclude = null)
+        protected RemoteStaticAppResult RemoteStaticApp(string backendUri, string fallbackExclude = null)
         {
             if (backendUri is null)
             {
                 throw new ArgumentNullException(nameof(backendUri));
             }
 
-            return new RemoteStaticAppResult(backendUri) { FallbackExclude = fallbackExclude };
+            return new(backendUri) { FallbackExclude = fallbackExclude };
         }
 
-        protected IActionResult LocalStaticApp(string defaultFile = "index.html", string fallbackPath = "404.html", string fallbackExclude = null)
+        protected LocalStaticAppResult LocalStaticApp(string defaultFile = "index.html", string fallbackPath = "404.html", string fallbackExclude = null)
         {
-            return new LocalStaticAppResult { DefaultFile = defaultFile, FallbackPath = fallbackPath, FallbackExclude = fallbackExclude };
+            return new() { DefaultFile = defaultFile, FallbackPath = fallbackPath, FallbackExclude = fallbackExclude };
         }
 
         #endregion
