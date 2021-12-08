@@ -94,7 +94,7 @@ namespace Azure.WebJobs.Extensions.HttpApi.Internal
                     continue;
                 }
 
-                httpContext.Response.Headers.Add(name, value.ToArray());
+                httpContext.Response.Headers.TryAdd(name, value.ToArray());
             }
 
             foreach (var (name, value) in response.Content.Headers)
@@ -104,7 +104,7 @@ namespace Azure.WebJobs.Extensions.HttpApi.Internal
                     continue;
                 }
 
-                httpContext.Response.Headers.Add(name, value.ToArray());
+                httpContext.Response.Headers.TryAdd(name, value.ToArray());
             }
         }
 
