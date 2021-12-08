@@ -37,9 +37,12 @@ namespace Azure.WebJobs.Extensions.HttpApi.Core
 
             if (generatedBackendUri == backendUri)
             {
-                var (_, value) = routeValues.Single();
+                if (routeValues.Count == 1)
+                {
+                    var (_, value) = routeValues.First();
 
-                generatedBackendUri += generatedBackendUri.EndsWith("/") ? value : $"/{value}";
+                    generatedBackendUri += generatedBackendUri.EndsWith("/") ? value : $"/{value}";
+                }
             }
 
             return generatedBackendUri;
