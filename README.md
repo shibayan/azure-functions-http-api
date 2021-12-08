@@ -140,7 +140,7 @@ public class Function1 : HttpFunctionBase
 
     [FunctionName("Function1")]
     public IActionResult Run(
-        [HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req,
         ILogger log)
     {
         return File("sample.html");
@@ -160,7 +160,7 @@ public class Function1 : HttpFunctionBase
 
     [FunctionName("Function1")]
     public IActionResult Run(
-        [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "{*path}"})] HttpRequest req,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "{*path}"})] HttpRequest req,
         ILogger log)
     {
         return Proxy("https://example.com/{path}");
@@ -180,7 +180,7 @@ public class Function1 : HttpFunctionBase
 
     [FunctionName("Function1")]
     public IActionResult Run(
-        [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "{*path}"})] HttpRequest req,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "{*path}"})] HttpRequest req,
         ILogger log)
     {
 #if USE_REMOTE
