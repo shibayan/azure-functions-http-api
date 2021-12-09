@@ -19,12 +19,12 @@ namespace Azure.WebJobs.Extensions.HttpApi.Internal
                 RequestUri = new Uri(destinationUri)
             };
 
-            CopyRequestHeaders(httpContext, request);
-
             if (HasRequestBody(httpContext))
             {
                 request.Content = new StreamContent(httpContext.Request.Body);
             }
+
+            CopyRequestHeaders(httpContext, request);
 
             beforeSend?.Invoke(request);
 
@@ -81,7 +81,10 @@ namespace Azure.WebJobs.Extensions.HttpApi.Internal
                     continue;
                 }
 
-                request.Headers.TryAddWithoutValidation(name, (string)value);
+                if (!request.Headers.TryAddWithoutValidation(name, (string)value))
+                {
+                    request.Content?.Headers.TryAddWithoutValidation(name, (string)value);
+                }
             }
         }
 
