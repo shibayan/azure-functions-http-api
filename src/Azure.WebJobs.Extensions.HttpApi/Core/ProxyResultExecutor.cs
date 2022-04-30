@@ -12,8 +12,8 @@ namespace Azure.WebJobs.Extensions.HttpApi.Core
 {
     internal class ProxyResultExecutor : IActionResultExecutor<ProxyResult>
     {
-        private static readonly HttpForwarder _httpForwarder = new();
-        private static readonly Regex _templateRegex = new(@"\{([^\{\}]+)\}", RegexOptions.Compiled);
+        private static readonly HttpForwarder s_httpForwarder = new();
+        private static readonly Regex s_templateRegex = new(@"\{([^\{\}]+)\}", RegexOptions.Compiled);
 
         public async Task ExecuteAsync(ActionContext context, ProxyResult result)
         {
@@ -21,7 +21,7 @@ namespace Azure.WebJobs.Extensions.HttpApi.Core
             {
                 var backendUri = MakeBackendUri(result.BackendUri, context);
 
-                await _httpForwarder.SendAsync(backendUri, context.HttpContext, result.BeforeSend, result.AfterSend);
+                await s_httpForwarder.SendAsync(backendUri, context.HttpContext, result.BeforeSend, result.AfterSend);
             }
             catch
             {
@@ -33,7 +33,7 @@ namespace Azure.WebJobs.Extensions.HttpApi.Core
         {
             var routeValues = context.RouteData.Values;
 
-            var generatedBackendUri = _templateRegex.Replace(backendUri, m => routeValues[m.Groups[1].Value]?.ToString() ?? "");
+            var generatedBackendUri = s_templateRegex.Replace(backendUri, m => routeValues[m.Groups[1].Value]?.ToString() ?? "");
 
             if (generatedBackendUri == backendUri)
             {

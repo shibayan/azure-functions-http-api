@@ -76,7 +76,7 @@ namespace Azure.WebJobs.Extensions.HttpApi.Internal
         {
             foreach (var (name, value) in httpContext.Request.Headers)
             {
-                if (_skipHeaders.Contains(name))
+                if (s_skipHeaders.Contains(name))
                 {
                     continue;
                 }
@@ -92,7 +92,7 @@ namespace Azure.WebJobs.Extensions.HttpApi.Internal
         {
             foreach (var (name, value) in response.Headers)
             {
-                if (_skipHeaders.Contains(name))
+                if (s_skipHeaders.Contains(name))
                 {
                     continue;
                 }
@@ -102,7 +102,7 @@ namespace Azure.WebJobs.Extensions.HttpApi.Internal
 
             foreach (var (name, value) in response.Content.Headers)
             {
-                if (_skipHeaders.Contains(name))
+                if (s_skipHeaders.Contains(name))
                 {
                     continue;
                 }
@@ -119,7 +119,7 @@ namespace Azure.WebJobs.Extensions.HttpApi.Internal
             UseProxy = false
         });
 
-        private static readonly HashSet<string> _skipHeaders = new(StringComparer.OrdinalIgnoreCase)
+        private static readonly HashSet<string> s_skipHeaders = new(StringComparer.OrdinalIgnoreCase)
         {
             "Host",
             "Connection",

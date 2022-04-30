@@ -13,7 +13,7 @@ namespace Azure.WebJobs.Extensions.HttpApi.Core
 
         public string FallbackExclude { get; set; }
 
-        private static readonly LocalStaticAppResultExecutor _executor = new();
+        private static readonly LocalStaticAppResultExecutor s_executor = new();
 
         public Task ExecuteResultAsync(ActionContext context)
         {
@@ -22,7 +22,7 @@ namespace Azure.WebJobs.Extensions.HttpApi.Core
                 throw new ArgumentNullException(nameof(context));
             }
 
-            return _executor.ExecuteAsync(context, this);
+            return s_executor.ExecuteAsync(context, this);
         }
     }
 }

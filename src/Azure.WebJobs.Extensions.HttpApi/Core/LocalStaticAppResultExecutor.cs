@@ -18,16 +18,16 @@ namespace Azure.WebJobs.Extensions.HttpApi.Core
     {
         private const string DefaultContentType = "application/octet-stream";
 
-        private static readonly PhysicalFileProvider _fileProvider = new(Path.Combine(FunctionEnvironment.RootPath, "wwwroot"));
-        private static readonly FileExtensionContentTypeProvider _contentTypeProvider = new();
+        private static readonly PhysicalFileProvider s_fileProvider = new(Path.Combine(FunctionEnvironment.RootPath, "wwwroot"));
+        private static readonly FileExtensionContentTypeProvider s_contentTypeProvider = new();
 
         public async Task ExecuteAsync(ActionContext context, LocalStaticAppResult result)
         {
             var (_, value) = context.RouteData.Values.Single();
 
-            var virtualPath = $"/{value?.ToString()}";
+            var virtualPath = $"/{value}";
 
-            var contents = _fileProvider.GetDirectoryContents(virtualPath);
+            var contents = s_fileProvider.GetDirectoryContents(virtualPath);
 
             if (contents.Exists)
             {
@@ -55,7 +55,7 @@ namespace Azure.WebJobs.Extensions.HttpApi.Core
 
         private void SetResponseHeaders(HttpResponse response, IFileInfo fileInfo)
         {
-            response.ContentType = _contentTypeProvider.TryGetContentType(fileInfo.Name, out var contentType) ? contentType : DefaultContentType;
+            response.ContentType = s_contentTypeProvider.TryGetContentType(fileInfo.Name, out var contentType) ? contentType : DefaultContentType;
             response.ContentLength = fileInfo.Length;
 
             var typedHeaders = response.GetTypedHeaders();
@@ -65,14 +65,14 @@ namespace Azure.WebJobs.Extensions.HttpApi.Core
 
         private IFileInfo GetFileInformation(string virtualPath, LocalStaticAppResult result)
         {
-            var fileInfo = _fileProvider.GetFileInfo(virtualPath);
+            var fileInfo = s_fileProvider.GetFileInfo(virtualPath);
 
             if (!fileInfo.Exists)
             {
                 // Try Fallback
                 if (!string.IsNullOrEmpty(result.FallbackPath) && (string.IsNullOrEmpty(result.FallbackExclude) || !Regex.IsMatch(virtualPath, result.FallbackExclude)))
                 {
-                    return _fileProvider.GetFileInfo(result.FallbackPath);
+                    return s_fileProvider.GetFileInfo(result.FallbackPath);
                 }
             }
 
