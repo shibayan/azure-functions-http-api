@@ -6,7 +6,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 
 namespace Azure.WebJobs.Extensions.HttpApi.Internal
 {
-    internal static class IWebJobsRouterExtensions
+    internal static class WebJobsRouterExtensions
     {
         public static IReadOnlyList<Route> GetRoutes(this IWebJobsRouter router)
         {

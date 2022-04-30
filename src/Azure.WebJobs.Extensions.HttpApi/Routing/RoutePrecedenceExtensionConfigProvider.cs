@@ -14,13 +14,11 @@ namespace Azure.WebJobs.Extensions.HttpApi.Routing
     {
         public RoutePrecedenceExtensionConfigProvider(IHostApplicationLifetime hostApplicationLifetime, IWebJobsRouter router)
         {
-            _hostApplicationLifetime = hostApplicationLifetime;
             _router = router;
 
-            _hostApplicationLifetime.ApplicationStarted.Register(() => PrecedenceRoutes());
+            hostApplicationLifetime.ApplicationStarted.Register(PrecedenceRoutes);
         }
 
-        private readonly IHostApplicationLifetime _hostApplicationLifetime;
         private readonly IWebJobsRouter _router;
 
         public void Initialize(ExtensionConfigContext context)

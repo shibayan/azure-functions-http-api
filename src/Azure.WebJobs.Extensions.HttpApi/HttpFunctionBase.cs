@@ -37,14 +37,14 @@ namespace Azure.WebJobs.Extensions.HttpApi
 
         private const string DefaultContentType = "application/octet-stream";
 
-        private static readonly PhysicalFileProvider _fileProvider = new(FunctionEnvironment.RootPath);
-        private static readonly FileExtensionContentTypeProvider _contentTypeProvider = new();
+        private static readonly PhysicalFileProvider s_fileProvider = new(FunctionEnvironment.RootPath);
+        private static readonly FileExtensionContentTypeProvider s_contentTypeProvider = new();
 
         protected HttpContext HttpContext => _httpContextAccessor.HttpContext;
         protected HttpRequest Request => HttpContext?.Request;
         protected HttpResponse Response => HttpContext?.Response;
         protected ClaimsPrincipal User => HttpContext?.User;
-        protected ModelStateDictionary ModelState { get; } = new ModelStateDictionary();
+        protected ModelStateDictionary ModelState { get; } = new();
 
         protected IUrlHelper Url
         {
@@ -52,7 +52,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
             {
                 if (_url is null)
                 {
-                    var factory = HttpContext?.RequestServices?.GetRequiredService<IUrlHelperFactory>();
+                    var factory = HttpContext?.RequestServices.GetRequiredService<IUrlHelperFactory>();
 
                     _url = factory?.GetUrlHelper(new ActionContext(HttpContext, HttpContext.GetRouteData(), new ActionDescriptor()));
                 }
@@ -62,10 +62,10 @@ namespace Azure.WebJobs.Extensions.HttpApi
         }
 
         protected IObjectModelValidator ObjectValidator
-            => _objectModelValidator ??= HttpContext?.RequestServices?.GetRequiredService<IObjectModelValidator>();
+            => _objectModelValidator ??= HttpContext?.RequestServices.GetRequiredService<IObjectModelValidator>();
 
         protected ProblemDetailsFactory ProblemDetailsFactory
-            => _problemDetailsFactory ??= HttpContext?.RequestServices?.GetRequiredService<ProblemDetailsFactory>();
+            => _problemDetailsFactory ??= HttpContext?.RequestServices.GetRequiredService<ProblemDetailsFactory>();
 
         #region IActionResult helpers
 
@@ -103,13 +103,13 @@ namespace Azure.WebJobs.Extensions.HttpApi
             => new(fileStream, contentType) { FileDownloadName = fileDownloadName };
 
         protected VirtualFileResult File(string virtualPath)
-            => File(virtualPath, _contentTypeProvider.TryGetContentType(virtualPath, out var contentType) ? contentType : DefaultContentType);
+            => File(virtualPath, s_contentTypeProvider.TryGetContentType(virtualPath, out var contentType) ? contentType : DefaultContentType);
 
         protected VirtualFileResult File(string virtualPath, string contentType)
             => File(virtualPath, contentType, null);
 
         protected VirtualFileResult File(string virtualPath, string contentType, string fileDownloadName)
-            => new(virtualPath, contentType) { FileDownloadName = fileDownloadName, FileProvider = _fileProvider };
+            => new(virtualPath, contentType) { FileDownloadName = fileDownloadName, FileProvider = s_fileProvider };
 
         protected UnauthorizedResult Unauthorized() => new();
         protected UnauthorizedObjectResult Unauthorized(object value) => new(value);
@@ -129,7 +129,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
         {
             var problemDetails = ProblemDetailsFactory.CreateProblemDetails(HttpContext, statusCode ?? 500, title, type, detail, instance);
 
-            return new(problemDetails) { StatusCode = problemDetails.Status };
+            return new ObjectResult(problemDetails) { StatusCode = problemDetails.Status };
         }
 
         protected BadRequestObjectResult ValidationProblem(ValidationProblemDetails descriptor)
@@ -139,7 +139,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
                 throw new ArgumentNullException(nameof(descriptor));
             }
 
-            return new(descriptor);
+            return new BadRequestObjectResult(descriptor);
         }
 
         protected ObjectResult ValidationProblem(ModelStateDictionary modelState) => ValidationProblem(modelStateDictionary: modelState);
@@ -148,7 +148,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
         {
             var validationProblem = ProblemDetailsFactory.CreateValidationProblemDetails(HttpContext, modelStateDictionary ?? ModelState, statusCode, title, type, detail, instance);
 
-            return new(validationProblem) { StatusCode = validationProblem.Status };
+            return new ObjectResult(validationProblem) { StatusCode = validationProblem.Status };
         }
 
         protected CreatedResult Created(string uri, object value)
@@ -158,7 +158,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
                 throw new ArgumentNullException(nameof(uri));
             }
 
-            return new(uri, value);
+            return new CreatedResult(uri, value);
         }
 
         protected CreatedResult Created(Uri uri, object value)
@@ -168,7 +168,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
                 throw new ArgumentNullException(nameof(uri));
             }
 
-            return new(uri, value);
+            return new CreatedResult(uri, value);
         }
 
         protected CreatedResult CreatedAtFunction(string functionName) => CreatedAtFunction(functionName, null, null);
@@ -187,7 +187,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
                 throw new ArgumentNullException(nameof(uri));
             }
 
-            return new(uri, null);
+            return new AcceptedResult(uri, null);
         }
 
         protected AcceptedResult Accepted(string uri) => new(uri, null);
@@ -199,7 +199,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
                 throw new ArgumentNullException(nameof(uri));
             }
 
-            return new(uri, value);
+            return new AcceptedResult(uri, value);
         }
 
         protected AcceptedResult Accepted(string uri, object value) => new(uri, value);
@@ -220,7 +220,7 @@ namespace Azure.WebJobs.Extensions.HttpApi
                 throw new ArgumentNullException(nameof(backendUri));
             }
 
-            return new(backendUri) { BeforeSend = beforeSend, AfterSend = afterSend };
+            return new ProxyResult(backendUri) { BeforeSend = beforeSend, AfterSend = afterSend };
         }
 
         protected RemoteStaticAppResult RemoteStaticApp(string backendUri, string fallbackExclude = null)
@@ -230,12 +230,12 @@ namespace Azure.WebJobs.Extensions.HttpApi
                 throw new ArgumentNullException(nameof(backendUri));
             }
 
-            return new(backendUri) { FallbackExclude = fallbackExclude };
+            return new RemoteStaticAppResult(backendUri) { FallbackExclude = fallbackExclude };
         }
 
         protected LocalStaticAppResult LocalStaticApp(string defaultFile = "index.html", string fallbackPath = "404.html", string fallbackExclude = null)
         {
-            return new() { DefaultFile = defaultFile, FallbackPath = fallbackPath, FallbackExclude = fallbackExclude };
+            return new LocalStaticAppResult { DefaultFile = defaultFile, FallbackPath = fallbackPath, FallbackExclude = fallbackExclude };
         }
 
         #endregion

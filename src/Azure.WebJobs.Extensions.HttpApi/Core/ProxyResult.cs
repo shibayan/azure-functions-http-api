@@ -19,7 +19,7 @@ namespace Azure.WebJobs.Extensions.HttpApi.Core
 
         public Action<HttpResponseMessage> AfterSend { get; set; }
 
-        private static ProxyResultExecutor _executor = new();
+        private static readonly ProxyResultExecutor s_executor = new();
 
         public Task ExecuteResultAsync(ActionContext context)
         {
@@ -28,7 +28,7 @@ namespace Azure.WebJobs.Extensions.HttpApi.Core
                 throw new ArgumentNullException(nameof(context));
             }
 
-            return _executor.ExecuteAsync(context, this);
+            return s_executor.ExecuteAsync(context, this);
         }
     }
 }
