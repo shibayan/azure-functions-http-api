@@ -5,10 +5,9 @@ using Microsoft.Azure.WebJobs.Hosting;
 
 [assembly: WebJobsStartup(typeof(Azure.WebJobs.Extensions.HttpApi.HttpApiWebJobsStartup))]
 
-namespace Azure.WebJobs.Extensions.HttpApi
+namespace Azure.WebJobs.Extensions.HttpApi;
+
+public class HttpApiWebJobsStartup : IWebJobsStartup
 {
-    public class HttpApiWebJobsStartup : IWebJobsStartup
-    {
-        public void Configure(IWebJobsBuilder builder) => builder.AddHttpApi();
-    }
+    public void Configure(IWebJobsBuilder builder) => builder.AddHttpApi();
 }

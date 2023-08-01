@@ -6,21 +6,20 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 
-namespace VirtualPathSample
-{
-    public class Function1 : HttpFunctionBase
-    {
-        public Function1(IHttpContextAccessor httpContextAccessor)
-            : base(httpContextAccessor)
-        {
-        }
+namespace VirtualPathSample;
 
-        [FunctionName("Function1")]
-        public IActionResult Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req,
-            ILogger log)
-        {
-            return File("sample.html");
-        }
+public class Function1 : HttpFunctionBase
+{
+    public Function1(IHttpContextAccessor httpContextAccessor)
+        : base(httpContextAccessor)
+    {
+    }
+
+    [FunctionName("Function1")]
+    public IActionResult Run(
+        [HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req,
+        ILogger log)
+    {
+        return File("sample.html");
     }
 }
