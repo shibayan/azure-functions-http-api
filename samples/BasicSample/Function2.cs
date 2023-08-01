@@ -8,24 +8,23 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 
-namespace BasicSample
+namespace BasicSample;
+
+public class Function2 : HttpFunctionBase
 {
-    public class Function2 : HttpFunctionBase
+    public Function2(IHttpContextAccessor httpContextAccessor)
+        : base(httpContextAccessor)
     {
-        public Function2(IHttpContextAccessor httpContextAccessor)
-            : base(httpContextAccessor)
-        {
-        }
+    }
 
-        [FunctionName(nameof(Function2))]
-        public IActionResult Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get")]
-            HttpRequest req,
-            ILogger log)
-        {
-            Response.Headers.Add("Cache-Control", "no-cache");
+    [FunctionName(nameof(Function2))]
+    public IActionResult Run(
+        [HttpTrigger(AuthorizationLevel.Function, "get")]
+        HttpRequest req,
+        ILogger log)
+    {
+        Response.Headers.Add("Cache-Control", "no-cache");
 
-            return Ok($"Now: {DateTime.Now}");
-        }
+        return Ok($"Now: {DateTime.Now}");
     }
 }

@@ -6,27 +6,26 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 
-namespace BasicSample
+namespace BasicSample;
+
+public class Function4 : HttpFunctionBase
 {
-    public class Function4 : HttpFunctionBase
+    public Function4(IHttpContextAccessor httpContextAccessor)
+        : base(httpContextAccessor)
     {
-        public Function4(IHttpContextAccessor httpContextAccessor)
-            : base(httpContextAccessor)
+    }
+
+    [FunctionName(nameof(Function4))]
+    public IActionResult Run(
+        [HttpTrigger(AuthorizationLevel.Function, "post")]
+        SampleModel model,
+        ILogger log)
+    {
+        if (!TryValidateModel(model))
         {
+            return ValidationProblem(ModelState);
         }
 
-        [FunctionName(nameof(Function4))]
-        public IActionResult Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post")]
-            SampleModel model,
-            ILogger log)
-        {
-            if (!TryValidateModel(model))
-            {
-                return ValidationProblem(ModelState);
-            }
-
-            return Ok(model);
-        }
+        return Ok(model);
     }
 }
