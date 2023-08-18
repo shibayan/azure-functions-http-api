@@ -45,6 +45,7 @@ public abstract class HttpFunctionBase
     protected HttpResponse Response => HttpContext?.Response;
     protected ClaimsPrincipal User => HttpContext?.User;
     protected ModelStateDictionary ModelState { get; } = new();
+    protected bool IsAuthenticationEnabled => FunctionAppEnvironment.IsAuthenticationEnabled;
 
     protected IUrlHelper Url
     {
@@ -134,10 +135,7 @@ public abstract class HttpFunctionBase
 
     protected BadRequestObjectResult ValidationProblem(ValidationProblemDetails descriptor)
     {
-        if (descriptor is null)
-        {
-            throw new ArgumentNullException(nameof(descriptor));
-        }
+        ArgumentNullException.ThrowIfNull(descriptor);
 
         return new BadRequestObjectResult(descriptor);
     }
@@ -153,20 +151,14 @@ public abstract class HttpFunctionBase
 
     protected CreatedResult Created(string uri, object value)
     {
-        if (uri is null)
-        {
-            throw new ArgumentNullException(nameof(uri));
-        }
+        ArgumentNullException.ThrowIfNull(uri);
 
         return new CreatedResult(uri, value);
     }
 
     protected CreatedResult Created(Uri uri, object value)
     {
-        if (uri is null)
-        {
-            throw new ArgumentNullException(nameof(uri));
-        }
+        ArgumentNullException.ThrowIfNull(uri);
 
         return new CreatedResult(uri, value);
     }
@@ -182,10 +174,7 @@ public abstract class HttpFunctionBase
 
     protected AcceptedResult Accepted(Uri uri)
     {
-        if (uri is null)
-        {
-            throw new ArgumentNullException(nameof(uri));
-        }
+        ArgumentNullException.ThrowIfNull(uri);
 
         return new AcceptedResult(uri, null);
     }
@@ -194,10 +183,7 @@ public abstract class HttpFunctionBase
 
     protected AcceptedResult Accepted(Uri uri, object value)
     {
-        if (uri is null)
-        {
-            throw new ArgumentNullException(nameof(uri));
-        }
+        ArgumentNullException.ThrowIfNull(uri);
 
         return new AcceptedResult(uri, value);
     }
@@ -215,20 +201,14 @@ public abstract class HttpFunctionBase
 
     protected ProxyResult Proxy(string backendUri, Action<HttpRequestMessage> beforeSend = null, Action<HttpResponseMessage> afterSend = null)
     {
-        if (backendUri is null)
-        {
-            throw new ArgumentNullException(nameof(backendUri));
-        }
+        ArgumentNullException.ThrowIfNull(backendUri);
 
         return new ProxyResult(backendUri) { BeforeSend = beforeSend, AfterSend = afterSend };
     }
 
     protected RemoteStaticAppResult RemoteStaticApp(string backendUri, string fallbackExclude = null)
     {
-        if (backendUri is null)
-        {
-            throw new ArgumentNullException(nameof(backendUri));
-        }
+        ArgumentNullException.ThrowIfNull(backendUri);
 
         return new RemoteStaticAppResult(backendUri) { FallbackExclude = fallbackExclude };
     }

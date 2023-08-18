@@ -43,13 +43,13 @@ internal class HttpForwarder
     {
         return method switch
         {
-            { } when HttpMethods.IsGet(method) => HttpMethod.Get,
-            { } when HttpMethods.IsPost(method) => HttpMethod.Post,
-            { } when HttpMethods.IsPut(method) => HttpMethod.Put,
-            { } when HttpMethods.IsDelete(method) => HttpMethod.Delete,
-            { } when HttpMethods.IsOptions(method) => HttpMethod.Options,
-            { } when HttpMethods.IsHead(method) => HttpMethod.Head,
-            { } when HttpMethods.IsPatch(method) => HttpMethod.Patch,
+            not null when HttpMethods.IsGet(method) => HttpMethod.Get,
+            not null when HttpMethods.IsPost(method) => HttpMethod.Post,
+            not null when HttpMethods.IsPut(method) => HttpMethod.Put,
+            not null when HttpMethods.IsDelete(method) => HttpMethod.Delete,
+            not null when HttpMethods.IsOptions(method) => HttpMethod.Options,
+            not null when HttpMethods.IsHead(method) => HttpMethod.Head,
+            not null when HttpMethods.IsPatch(method) => HttpMethod.Patch,
             _ => throw new ArgumentOutOfRangeException(nameof(method), method, null)
         };
     }
@@ -64,12 +64,7 @@ internal class HttpForwarder
             return true;
         }
 
-        if (HttpMethods.IsGet(method) || HttpMethods.IsHead(method) || HttpMethods.IsDelete(method))
-        {
-            return false;
-        }
-
-        return true;
+        return !HttpMethods.IsGet(method) && !HttpMethods.IsHead(method) && !HttpMethods.IsDelete(method);
     }
 
     private static void CopyRequestHeaders(HttpContext httpContext, HttpRequestMessage request)
