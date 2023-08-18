@@ -10,7 +10,9 @@ public class ProxyResult : IActionResult
 {
     public ProxyResult(string backendUri)
     {
-        BackendUri = backendUri ?? throw new ArgumentNullException(nameof(backendUri));
+        ArgumentNullException.ThrowIfNull(backendUri);
+
+        BackendUri = backendUri;
     }
 
     public string BackendUri { get; }
@@ -23,10 +25,7 @@ public class ProxyResult : IActionResult
 
     public Task ExecuteResultAsync(ActionContext context)
     {
-        if (context is null)
-        {
-            throw new ArgumentNullException(nameof(context));
-        }
+        ArgumentNullException.ThrowIfNull(context);
 
         return s_executor.ExecuteAsync(context, this);
     }

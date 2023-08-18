@@ -10,10 +10,7 @@ public static class HttpApiWebJobsBuilderExtensions
 {
     public static IWebJobsBuilder AddHttpApi(this IWebJobsBuilder builder)
     {
-        if (builder is null)
-        {
-            throw new ArgumentNullException(nameof(builder));
-        }
+        ArgumentNullException.ThrowIfNull(builder);
 
         builder.AddExtension<RoutePrecedenceExtensionConfigProvider>();
 

@@ -17,10 +17,7 @@ public class LocalStaticAppResult : IActionResult
 
     public Task ExecuteResultAsync(ActionContext context)
     {
-        if (context is null)
-        {
-            throw new ArgumentNullException(nameof(context));
-        }
+        ArgumentNullException.ThrowIfNull(context);
 
         return s_executor.ExecuteAsync(context, this);
     }
