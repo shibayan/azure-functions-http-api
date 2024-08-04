@@ -6,25 +6,16 @@ on:
   pull_request:
     branches: [ master ]
 
-env:
-  DOTNET_VERSION: 6.0.x
-  DOTNETCORE_VERSION: 3.1.x
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
 
-    - name: Use .NET ${{ env.DOTNET_VERSION }}
+    - name: Use .NET SDK
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-
-    - name: Use .NET Core ${{ env.DOTNETCORE_VERSION }}
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ env.DOTNETCORE_VERSION }}
+        dotnet-version: 8.0.x
 
     - name: Build project
       run: dotnet build -c Release

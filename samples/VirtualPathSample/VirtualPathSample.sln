@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31815.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualPathSample", "VirtualPathSample.csproj", "{F4ADFB78-91BB-44F9-9135-0F09998B13D8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Azure.WebJobs.Extensions.HttpApi", "..\..\src\Azure.WebJobs.Extensions.HttpApi\Azure.WebJobs.Extensions.HttpApi.csproj", "{722E5142-1AC4-40A4-AD33-8FC3F4405A3B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebJobs.Extensions.HttpApi", "..\..\src\WebJobs.Extensions.HttpApi\WebJobs.Extensions.HttpApi.csproj", "{722E5142-1AC4-40A4-AD33-8FC3F4405A3B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

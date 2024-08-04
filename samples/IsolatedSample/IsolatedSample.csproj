@@ -2,12 +2,16 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.4.1" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.22.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.17.4" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\WebJobs.Extensions.HttpApi\WebJobs.Extensions.HttpApi.csproj" />
+    <ProjectReference Include="..\..\src\Functions.Worker.Extensions.HttpApi\Functions.Worker.Extensions.HttpApi.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
@@ -17,5 +21,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext" />
   </ItemGroup>
 </Project>
