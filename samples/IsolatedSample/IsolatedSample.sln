@@ -5,7 +5,7 @@ VisualStudioVersion = 17.7.34009.444
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IsolatedSample", "IsolatedSample.csproj", "{E0170A2B-D4D1-4097-94D8-46B881A93BFD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Azure.Functions.Worker.Extensions.HttpApi", "..\..\src\Azure.Functions.Worker.Extensions.HttpApi\Azure.Functions.Worker.Extensions.HttpApi.csproj", "{41AD5EA8-3CDF-4EA6-94DC-5CB920AF3B86}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Functions.Worker.Extensions.HttpApi", "..\..\src\Functions.Worker.Extensions.HttpApi\Functions.Worker.Extensions.HttpApi.csproj", "{41AD5EA8-3CDF-4EA6-94DC-5CB920AF3B86}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.2.0" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.4.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Azure.WebJobs.Extensions.HttpApi\Azure.WebJobs.Extensions.HttpApi.csproj" />
+    <ProjectReference Include="..\..\src\WebJobs.Extensions.HttpApi\WebJobs.Extensions.HttpApi.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">

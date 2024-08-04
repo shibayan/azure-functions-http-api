@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 
-using Azure.WebJobs.Extensions.HttpApi.Core;
 using Azure.WebJobs.Extensions.HttpApi.Internal;
 
 using Microsoft.AspNetCore.Http;
@@ -20,17 +19,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Net.Http.Headers;
 
-namespace Azure.WebJobs.Extensions.HttpApi;
+namespace Azure.WebJobs.Extensions.HttpApi.Core;
 
-public abstract class HttpFunctionBase
+public abstract class HttpFunctionImpl(IHttpContextAccessor httpContextAccessor)
 {
-    protected HttpFunctionBase(IHttpContextAccessor httpContextAccessor)
-    {
-        _httpContextAccessor = httpContextAccessor;
-    }
-
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
     private IUrlHelper _url;
     private IObjectModelValidator _objectModelValidator;
     private ProblemDetailsFactory _problemDetailsFactory;
@@ -40,7 +32,7 @@ public abstract class HttpFunctionBase
     private static readonly PhysicalFileProvider s_fileProvider = new(FunctionAppEnvironment.RootPath);
     private static readonly FileExtensionContentTypeProvider s_contentTypeProvider = new();
 
-    protected HttpContext HttpContext => _httpContextAccessor.HttpContext;
+    protected HttpContext HttpContext => httpContextAccessor.HttpContext;
     protected HttpRequest Request => HttpContext?.Request;
     protected HttpResponse Response => HttpContext?.Response;
     protected ClaimsPrincipal User => HttpContext?.User;

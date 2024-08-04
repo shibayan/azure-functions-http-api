@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31815.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebJobs.Extensions.HttpApi", "src\WebJobs.Extensions.HttpApi\WebJobs.Extensions.HttpApi.csproj", "{312B6D09-BB13-4FD2-A667-8F6E27EA72BC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Worker.Extensions.HttpApi", "src\Worker.Extensions.HttpApi\Worker.Extensions.HttpApi.csproj", "{B028F049-984C-48F6-9FF0-AB7F67B48165}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Functions.Worker.Extensions.HttpApi", "src\Functions.Worker.Extensions.HttpApi\Functions.Worker.Extensions.HttpApi.csproj", "{B028F049-984C-48F6-9FF0-AB7F67B48165}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
