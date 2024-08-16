@@ -7,15 +7,10 @@ using Microsoft.Extensions.Logging;
 
 namespace IsolatedSample;
 
-public class Function1 : HttpFunctionBase
+public class Function1(IHttpContextAccessor httpContextAccessor, ILogger<Function1> logger)
+    : HttpFunctionBase(httpContextAccessor)
 {
-    private readonly ILogger _logger;
-
-    public Function1(IHttpContextAccessor httpContextAccessor, ILogger<Function1> logger)
-        : base(httpContextAccessor)
-    {
-        _logger = logger;
-    }
+    private readonly ILogger _logger = logger;
 
     [Function("Function1")]
     public IActionResult Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)

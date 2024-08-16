@@ -7,13 +7,8 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 
 namespace ProxySample;
 
-public class ReverseProxy : HttpFunctionBase
+public class ReverseProxy(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
 {
-    public ReverseProxy(IHttpContextAccessor httpContextAccessor)
-        : base(httpContextAccessor)
-    {
-    }
-
     [FunctionName(nameof(ReverseProxy))]
     public IActionResult Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "put", "delete", "options", "head", "patch", Route = "{*path}")]
