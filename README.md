@@ -18,22 +18,25 @@
 ## Installation
 
 ```
+# For .NET 6/8 In-Process
 Install-Package WebJobs.Extensions.HttpApi
+
+# For .NET Isolated Worker
+Install-Package Functions.Worker.Extensions.HttpApi
 ```
 
 ```
+# For .NET 6/8 In-Process
 dotnet add package WebJobs.Extensions.HttpApi
+
+# For .NET Isolated Worker
+dotnet add package Functions.Worker.Extensions.HttpApi
 ```
 
 ```csharp
 // Inherits from `HttpFunctionBase` class
-public class Function1 : HttpFunctionBase
+public class Function1(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
 {
-    public Function1(IHttpContextAccessor httpContextAccessor)
-        : base(httpContextAccessor)
-    {
-    }
-
     [FunctionName("Function1")]
     public IActionResult Run(
         [HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req,
@@ -49,13 +52,8 @@ public class Function1 : HttpFunctionBase
 ### Model validation
 
 ```csharp
-public class Function1 : HttpFunctionBase
+public class Function1(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
 {
-    public Function1(IHttpContextAccessor httpContextAccessor)
-        : base(httpContextAccessor)
-    {
-    }
-
     [FunctionName("Function1")]
     public IActionResult Run(
         [HttpTrigger(AuthorizationLevel.Function, "post")]
@@ -86,13 +84,8 @@ public class SampleModel
 ### ASP.NET Core like helpers
 
 ```csharp
-public class Function2 : HttpFunctionBase
+public class Function2(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
 {
-    public Function2(IHttpContextAccessor httpContextAccessor)
-        : base(httpContextAccessor)
-    {
-    }
-
     [FunctionName("Function2")]
     public IActionResult Run(
         [HttpTrigger(AuthorizationLevel.Function, "get")]
@@ -109,13 +102,8 @@ public class Function2 : HttpFunctionBase
 ### Support URL generation
 
 ```csharp
-public class Function3 : HttpFunctionBase
+public class Function3(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
 {
-    public Function3(IHttpContextAccessor httpContextAccessor)
-        : base(httpContextAccessor)
-    {
-    }
-
     [FunctionName("Function3")]
     public IActionResult Run(
         [HttpTrigger(AuthorizationLevel.Function, "get", Route = "route/{id}")]
@@ -131,13 +119,8 @@ public class Function3 : HttpFunctionBase
 ### Handle static files
 
 ```csharp
-public class Function1 : HttpFunctionBase
+public class Function1(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
 {
-    public Function1(IHttpContextAccessor httpContextAccessor)
-        : base(httpContextAccessor)
-    {
-    }
-
     [FunctionName("Function1")]
     public IActionResult Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req,
@@ -151,13 +134,8 @@ public class Function1 : HttpFunctionBase
 ### Simple reverse proxy
 
 ```csharp
-public class Function1 : HttpFunctionBase
+public class Function1(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
 {
-    public Function1(IHttpContextAccessor httpContextAccessor)
-        : base(httpContextAccessor)
-    {
-    }
-
     [FunctionName("Function1")]
     public IActionResult Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "{*path}"})] HttpRequest req,
@@ -171,13 +149,8 @@ public class Function1 : HttpFunctionBase
 ### Streamlined SPA / SSG hosting
 
 ```csharp
-public class Function1 : HttpFunctionBase
+public class Function1(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
 {
-    public Function1(IHttpContextAccessor httpContextAccessor)
-        : base(httpContextAccessor)
-    {
-    }
-
     [FunctionName("Function1")]
     public IActionResult Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "{*path}"})] HttpRequest req,

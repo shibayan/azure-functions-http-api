@@ -8,13 +8,8 @@ using Microsoft.Extensions.Logging;
 
 namespace BasicSample;
 
-public class Function5 : HttpFunctionBase
+public class Function5(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
 {
-    public Function5(IHttpContextAccessor httpContextAccessor)
-        : base(httpContextAccessor)
-    {
-    }
-
     [FunctionName(nameof(Function5))]
     public IActionResult Run(
         [HttpTrigger(AuthorizationLevel.Function, "post")]

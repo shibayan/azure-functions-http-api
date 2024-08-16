@@ -7,13 +7,8 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 
 namespace WebsiteSample;
 
-public class StaticWebsite : HttpFunctionBase
+public class StaticWebsite(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
 {
-    public StaticWebsite(IHttpContextAccessor httpContextAccessor)
-        : base(httpContextAccessor)
-    {
-    }
-
     [FunctionName(nameof(StaticWebsite))]
     public IActionResult Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "put", "delete", "options", "head", "patch", Route = "{*path}")]

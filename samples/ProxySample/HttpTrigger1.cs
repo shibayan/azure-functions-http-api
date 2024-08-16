@@ -8,13 +8,8 @@ using Microsoft.Extensions.Logging;
 
 namespace ProxySample;
 
-public class HttpTrigger1 : HttpFunctionBase
+public class HttpTrigger1(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
 {
-    public HttpTrigger1(IHttpContextAccessor httpContextAccessor)
-        : base(httpContextAccessor)
-    {
-    }
-
     [FunctionName(nameof(HttpTrigger1))]
     public IActionResult Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = $"api/{nameof(HttpTrigger1)}")] HttpRequest req,
