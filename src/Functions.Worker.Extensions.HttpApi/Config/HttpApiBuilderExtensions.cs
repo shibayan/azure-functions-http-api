@@ -12,10 +12,7 @@ public static class HttpApiBuilderExtensions
 {
     public static IFunctionsWorkerApplicationBuilder AddHttpApi(this IFunctionsWorkerApplicationBuilder builder)
     {
-        if (builder is null)
-        {
-            throw new ArgumentNullException(nameof(builder));
-        }
+        ArgumentNullException.ThrowIfNull(builder);
 
         builder.Services.AddHttpContextAccessor();
         builder.UseMiddleware<HttpContextAccessorMiddleware>();
