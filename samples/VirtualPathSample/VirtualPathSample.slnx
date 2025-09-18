@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../../src/WebJobs.Extensions.HttpApi/WebJobs.Extensions.HttpApi.csproj" />
+  <Project Path="VirtualPathSample.csproj" />
+</Solution>
