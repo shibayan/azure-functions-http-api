@@ -7,6 +7,8 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     steps:
     - uses: actions/checkout@v5
 
@@ -14,6 +16,12 @@ jobs:
       uses: actions/setup-dotnet@v5
       with:
         dotnet-version: 9.0.x
+
+    - name: NuGet login
+      uses: NuGet/login@v1
+      id: login
+      with:
+        user: shibayan
 
     - name: Setup Version
       id: setup_version
@@ -24,5 +32,5 @@ jobs:
         dotnet pack src/WebJobs.Extensions.HttpApi/WebJobs.Extensions.HttpApi.csproj -c Release -o ./dist -p:Version=${{ steps.setup_version.outputs.VERSION }}
         dotnet pack src/Functions.Worker.Extensions.HttpApi/Functions.Worker.Extensions.HttpApi.csproj -c Release -o ./dist -p:Version=${{ steps.setup_version.outputs.VERSION }}
 
-    - name: Publish
-      run: dotnet nuget push dist/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+    - name: Publish NuGet Packages
+      run: dotnet nuget push dist/*.nupkg -k ${{ steps.login.outputs.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
