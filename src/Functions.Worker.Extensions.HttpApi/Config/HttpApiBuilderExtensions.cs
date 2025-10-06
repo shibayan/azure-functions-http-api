@@ -15,7 +15,9 @@ public static class HttpApiBuilderExtensions
         ArgumentNullException.ThrowIfNull(builder);
 
         builder.Services.AddHttpContextAccessor();
+
         builder.UseMiddleware<HttpContextAccessorMiddleware>();
+        builder.UseMiddleware<AppServiceAuthenticationMiddleware>();
 
         return builder;
     }
