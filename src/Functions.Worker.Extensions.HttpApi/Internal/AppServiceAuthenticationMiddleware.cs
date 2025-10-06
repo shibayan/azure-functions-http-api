@@ -18,7 +18,10 @@ internal class AppServiceAuthenticationMiddleware : IFunctionsWorkerMiddleware
     {
         var httpContext = context.GetHttpContext();
 
-        httpContext.User = ParsePrincipal(httpContext.Request);
+        if (httpContext is not null)
+        {
+            httpContext.User = ParsePrincipal(httpContext.Request);
+        }
 
         await next(context);
     }
