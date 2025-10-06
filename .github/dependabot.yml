@@ -16,7 +16,7 @@ updates:
 
   - package-ecosystem: "nuget"
     directories:
-      - "/samples/**/*"
+      - "/samples/**"
     schedule:
       interval: "weekly"
     groups:
