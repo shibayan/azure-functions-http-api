@@ -16,6 +16,7 @@ public static class HttpApiBuilderExtensions
 
         builder.Services.AddHttpContextAccessor();
 
+        builder.UseMiddleware<InitializerMiddleware>();
         builder.UseMiddleware<HttpContextAccessorMiddleware>();
         builder.UseMiddleware<AppServiceAuthenticationMiddleware>();
 
