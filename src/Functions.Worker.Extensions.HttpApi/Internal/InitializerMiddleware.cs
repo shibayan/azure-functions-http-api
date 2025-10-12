@@ -12,13 +12,23 @@ using Microsoft.Extensions.Hosting;
 
 namespace Azure.Functions.Worker.Extensions.HttpApi.Internal;
 
-internal class InitializerMiddleware : IFunctionsWorkerMiddleware
+internal class InitializerMiddleware(IServiceProvider serviceProvider) : IFunctionsWorkerMiddleware
 {
-    public InitializerMiddleware(IServiceProvider serviceProvider) => Initialize(serviceProvider);
+    private bool _initialized;
 
-    public Task Invoke(FunctionContext context, FunctionExecutionDelegate next) => next(context);
+    public Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
+    {
+        var httpContext = context.GetHttpContext();
 
-    private void Initialize(IServiceProvider serviceProvider)
+        if (!_initialized && httpContext is not null)
+        {
+            _initialized = TryInitialize();
+        }
+
+        return next(context);
+    }
+
+    private bool TryInitialize()
     {
         var type = typeof(FunctionsHostBuilderExtensions).Assembly.GetTypes().First(x => x.Name == "FunctionsEndpointDataSource");
 
@@ -27,6 +37,11 @@ internal class InitializerMiddleware : IFunctionsWorkerMiddleware
         var field = type.GetField("_endpoints", BindingFlags.NonPublic | BindingFlags.Instance);
 
         var endpoints = (List<Endpoint>)field.GetValue(dataSource);
+
+        if (endpoints is null)
+        {
+            return false;
+        }
 
         var newEndpoints = new List<Endpoint>();
 
@@ -48,5 +63,7 @@ internal class InitializerMiddleware : IFunctionsWorkerMiddleware
         }
 
         field.SetValue(dataSource, newEndpoints);
+
+        return true;
     }
 }
