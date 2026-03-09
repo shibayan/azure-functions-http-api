@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -12,9 +8,15 @@ using Microsoft.Extensions.Hosting;
 
 namespace Azure.Functions.Worker.Extensions.HttpApi.Internal;
 
-internal class InitializerMiddleware(IServiceProvider serviceProvider) : IFunctionsWorkerMiddleware
+internal sealed class InitializerMiddleware(IServiceProvider serviceProvider) : IFunctionsWorkerMiddleware
 {
     private bool _initialized;
+    private readonly object _initializeLock = new();
+
+    private static readonly Type s_endpointDataSourceType = typeof(FunctionsHostBuilderExtensions).Assembly.GetTypes().FirstOrDefault(x => x.Name == "FunctionsEndpointDataSource")
+                                                        ?? throw new InvalidOperationException("The Azure Functions endpoint data source type could not be found.");
+    private static readonly FieldInfo s_endpointsField = s_endpointDataSourceType.GetField("_endpoints", BindingFlags.NonPublic | BindingFlags.Instance)
+                                                        ?? throw new MissingFieldException(s_endpointDataSourceType.FullName, "_endpoints");
 
     public Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
     {
@@ -22,7 +24,13 @@ internal class InitializerMiddleware(IServiceProvider serviceProvider) : IFuncti
 
         if (!_initialized && httpContext is not null)
         {
-            _initialized = TryInitialize();
+            lock (_initializeLock)
+            {
+                if (!_initialized)
+                {
+                    _initialized = TryInitialize();
+                }
+            }
         }
 
         return next(context);
@@ -30,20 +38,21 @@ internal class InitializerMiddleware(IServiceProvider serviceProvider) : IFuncti
 
     private bool TryInitialize()
     {
-        var type = typeof(FunctionsHostBuilderExtensions).Assembly.GetTypes().First(x => x.Name == "FunctionsEndpointDataSource");
+        var dataSource = serviceProvider.GetService(s_endpointDataSourceType);
 
-        var dataSource = serviceProvider.GetService(type);
+        if (dataSource is null)
+        {
+            return false;
+        }
 
-        var field = type.GetField("_endpoints", BindingFlags.NonPublic | BindingFlags.Instance);
-
-        var endpoints = (List<Endpoint>)field.GetValue(dataSource);
+        var endpoints = s_endpointsField.GetValue(dataSource) as List<Endpoint>;
 
         if (endpoints is null)
         {
             return false;
         }
 
-        var newEndpoints = new List<Endpoint>();
+        List<Endpoint> newEndpoints = [];
 
         foreach (var endpoint in endpoints.Cast<RouteEndpoint>())
         {
@@ -57,12 +66,12 @@ internal class InitializerMiddleware(IServiceProvider serviceProvider) : IFuncti
                 builder.Metadata.Add(metadata);
             }
 
-            builder.Metadata.Add(new RouteNameMetadata(endpoint.DisplayName));
+            builder.Metadata.Add(new RouteNameMetadata(endpoint.DisplayName ?? endpoint.RoutePattern.RawText ?? string.Empty));
 
             newEndpoints.Add(builder.Build());
         }
 
-        field.SetValue(dataSource, newEndpoints);
+        s_endpointsField.SetValue(dataSource, newEndpoints);
 
         return true;
     }

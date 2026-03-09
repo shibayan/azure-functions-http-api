@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Reflection;
 
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -8,17 +7,20 @@ namespace Azure.WebJobs.Extensions.HttpApi.Internal;
 
 internal static class WebJobsRouterExtensions
 {
+    private static readonly FieldInfo s_functionRoutesField = typeof(WebJobsRouter).GetField("_functionRoutes", BindingFlags.NonPublic | BindingFlags.Instance)
+                                                              ?? throw new MissingFieldException(typeof(WebJobsRouter).FullName, "_functionRoutes");
+
     public static IReadOnlyList<Route> GetRoutes(this IWebJobsRouter router)
     {
-        var field = typeof(WebJobsRouter).GetField("_functionRoutes", BindingFlags.NonPublic | BindingFlags.Instance);
-        var functionRoutes = (RouteCollection)field.GetValue(router);
+        var functionRoutes = s_functionRoutesField.GetValue(router) as RouteCollection
+                             ?? throw new InvalidOperationException("The WebJobs router does not contain a route collection.");
 
         return GetRoutes(functionRoutes);
     }
 
     private static IReadOnlyList<Route> GetRoutes(RouteCollection collection)
     {
-        var routes = new List<Route>();
+        List<Route> routes = [];
 
         for (var i = 0; i < collection.Count; i++)
         {
@@ -28,7 +30,10 @@ internal static class WebJobsRouterExtensions
                 continue;
             }
 
-            routes.Add((Route)collection[i]);
+            if (collection[i] is Route route)
+            {
+                routes.Add(route);
+            }
         }
 
         return routes;

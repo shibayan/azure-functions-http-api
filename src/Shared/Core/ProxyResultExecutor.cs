@@ -1,7 +1,5 @@
-﻿using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 using Azure.WebJobs.Extensions.HttpApi.Internal;
 
@@ -10,10 +8,9 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace Azure.WebJobs.Extensions.HttpApi.Core;
 
-internal class ProxyResultExecutor : IActionResultExecutor<ProxyResult>
+internal sealed partial class ProxyResultExecutor : IActionResultExecutor<ProxyResult>
 {
     private static readonly HttpForwarder s_httpForwarder = new();
-    private static readonly Regex s_templateRegex = new(@"\{([^\{\}]+)\}", RegexOptions.Compiled);
 
     public async Task ExecuteAsync(ActionContext context, ProxyResult result)
     {
@@ -33,11 +30,11 @@ internal class ProxyResultExecutor : IActionResultExecutor<ProxyResult>
     {
         var routeValues = context.RouteData.Values;
 
-        var generatedBackendUri = s_templateRegex.Replace(backendUri, m => routeValues[m.Groups[1].Value]?.ToString() ?? "");
+        var generatedBackendUri = TemplateRegex().Replace(backendUri, m => routeValues[m.Groups[1].Value]?.ToString() ?? string.Empty);
 
         if (generatedBackendUri == backendUri)
         {
-            if (routeValues.Count == 1)
+            if (routeValues.Count is 1)
             {
                 var (_, value) = routeValues.First();
 
@@ -47,4 +44,7 @@ internal class ProxyResultExecutor : IActionResultExecutor<ProxyResult>
 
         return generatedBackendUri;
     }
+
+    [GeneratedRegex(@"\{([^\{\}]+)\}")]
+    private static partial Regex TemplateRegex();
 }

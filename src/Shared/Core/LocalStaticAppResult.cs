@@ -1,17 +1,14 @@
-﻿using System;
-using System.Threading.Tasks;
-
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace Azure.WebJobs.Extensions.HttpApi.Core;
 
 public class LocalStaticAppResult : IActionResult
 {
-    public string DefaultFile { get; set; }
+    public string DefaultFile { get; set; } = "index.html";
 
-    public string FallbackPath { get; set; }
+    public string FallbackPath { get; set; } = "404.html";
 
-    public string FallbackExclude { get; set; }
+    public string? FallbackExclude { get; set; }
 
     private static readonly LocalStaticAppResultExecutor s_executor = new();
 

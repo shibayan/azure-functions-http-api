@@ -1,6 +1,4 @@
-﻿using System;
-
-using Azure.Functions.Worker.Extensions.HttpApi.Internal;
+﻿using Azure.Functions.Worker.Extensions.HttpApi.Internal;
 
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,10 +14,9 @@ public static class HttpApiBuilderExtensions
 
         builder.Services.AddHttpContextAccessor();
 
-        builder.UseMiddleware<InitializerMiddleware>();
-        builder.UseMiddleware<HttpContextAccessorMiddleware>();
-        builder.UseMiddleware<AppServiceAuthenticationMiddleware>();
-
-        return builder;
+        return builder
+            .UseMiddleware<InitializerMiddleware>()
+            .UseMiddleware<HttpContextAccessorMiddleware>()
+            .UseMiddleware<AppServiceAuthenticationMiddleware>();
     }
 }
