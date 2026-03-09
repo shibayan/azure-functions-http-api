@@ -1,46 +1,75 @@
 # HTTP API Extensions for Azure Functions
 
 [![Build](https://github.com/shibayan/azure-functions-http-api/workflows/Build/badge.svg)](https://github.com/shibayan/azure-functions-http-api/actions/workflows/build.yml)
-[![Downloads](https://badgen.net/nuget/dt/WebJobs.Extensions.HttpApi)](https://www.nuget.org/packages/WebJobs.Extensions.HttpApi/)
-[![NuGet](https://badgen.net/nuget/v/WebJobs.Extensions.HttpApi)](https://www.nuget.org/packages/WebJobs.Extensions.HttpApi/)
 [![License](https://badgen.net/github/license/shibayan/azure-functions-http-api)](https://github.com/shibayan/azure-functions-http-api/blob/master/LICENSE)
+
+| Package | NuGet |
+|---------|-------|
+| WebJobs.Extensions.HttpApi (In-Process) | [![NuGet](https://badgen.net/nuget/v/WebJobs.Extensions.HttpApi)](https://www.nuget.org/packages/WebJobs.Extensions.HttpApi/) [![Downloads](https://badgen.net/nuget/dt/WebJobs.Extensions.HttpApi)](https://www.nuget.org/packages/WebJobs.Extensions.HttpApi/) |
+| Functions.Worker.Extensions.HttpApi (Isolated Worker) | [![NuGet](https://badgen.net/nuget/v/Functions.Worker.Extensions.HttpApi)](https://www.nuget.org/packages/Functions.Worker.Extensions.HttpApi/) [![Downloads](https://badgen.net/nuget/dt/Functions.Worker.Extensions.HttpApi)](https://www.nuget.org/packages/Functions.Worker.Extensions.HttpApi/) |
+
+An extension library that brings ASP.NET Core-like developer experience to Azure Functions. Inherit from `HttpFunctionBase` to get access to familiar helpers such as `Ok()`, `BadRequest()`, `File()`, model validation, URL generation, and more — in both **In-Process** and **Isolated Worker** models.
 
 ## Features
 
-- Better route precedence
-- Model validation
-- ASP.NET Core like helpers
-- Support URL generation
-- Handle static files
-- Simple reverse proxy
-- Streamlined SPA / SSG hosting
+- **Model validation** — Validate request models with DataAnnotations using `TryValidateModel()` and return `BadRequest(ModelState)` or `ValidationProblem(ModelState)`
+- **ASP.NET Core-like helpers** — Use familiar methods such as `Ok()`, `BadRequest()`, `NotFound()`, `Unauthorized()`, `Content()`, `File()`, and access `Request` / `Response` / `User` directly
+- **URL generation** — Generate URLs to other functions with `CreatedAtFunction()` and `AcceptedAtFunction()`
+- **Static file hosting** — Serve files from `wwwroot` with automatic content-type detection
+- **Reverse proxy** — Forward requests to backend services with `Proxy()`, supporting route template substitution
+- **SPA / SSG hosting** — Host single-page applications with `LocalStaticApp()` or `RemoteStaticApp()`, including fallback routing and path exclusion
+- **App Service Authentication** — Access authenticated user info via the `User` property with App Service Authentication (EasyAuth) support
+- **Better route precedence** — Improved route matching behavior over default Azure Functions routing
 
 ## Installation
 
-```
-# For .NET 6/8 In-Process
-Install-Package WebJobs.Extensions.HttpApi
-
-# For .NET Isolated Worker
-Install-Package Functions.Worker.Extensions.HttpApi
-```
+### .NET Isolated Worker (Recommended)
 
 ```
-# For .NET 6/8 In-Process
-dotnet add package WebJobs.Extensions.HttpApi
-
-# For .NET Isolated Worker
 dotnet add package Functions.Worker.Extensions.HttpApi
 ```
 
+### .NET In-Process
+
+```
+dotnet add package WebJobs.Extensions.HttpApi
+```
+
+## Quick Start
+
+### Isolated Worker
+
 ```csharp
-// Inherits from `HttpFunctionBase` class
+// Program.cs
+var builder = FunctionsApplication.CreateBuilder(args);
+
+builder.ConfigureFunctionsWebApplication()
+       .AddHttpApi();
+
+builder.Build().Run();
+```
+
+```csharp
+// Function1.cs
+public class Function1(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
+{
+    [Function("Function1")]
+    public IActionResult Run(
+        [HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req)
+    {
+        return Ok($"Hello, {req.Query["name"]}");
+    }
+}
+```
+
+### In-Process
+
+```csharp
 public class Function1(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
 {
     [FunctionName("Function1")]
     public IActionResult Run(
-        [HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req,
-        ILogger log)
+        [HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req)
     {
         return Ok($"Hello, {req.Query["name"]}");
     }
@@ -49,16 +78,16 @@ public class Function1(IHttpContextAccessor httpContextAccessor) : HttpFunctionB
 
 ## Examples
 
-### Model validation
+### Model Validation
+
+Use `TryValidateModel()` with DataAnnotations to validate incoming request bodies.
 
 ```csharp
 public class Function1(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
 {
     [FunctionName("Function1")]
     public IActionResult Run(
-        [HttpTrigger(AuthorizationLevel.Function, "post")]
-        SampleModel model,
-        ILogger log)
+        [HttpTrigger(AuthorizationLevel.Function, "post")] SampleModel model)
     {
         if (!TryValidateModel(model))
         {
@@ -81,16 +110,25 @@ public class SampleModel
 }
 ```
 
-### ASP.NET Core like helpers
+You can also return RFC 7807 Problem Details format using `ValidationProblem()`:
+
+```csharp
+if (!TryValidateModel(model))
+{
+    return ValidationProblem(ModelState);
+}
+```
+
+### Accessing Request / Response / User
+
+Access `HttpContext`, `Request`, `Response`, and `User` properties directly, just like in ASP.NET Core controllers.
 
 ```csharp
 public class Function2(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
 {
     [FunctionName("Function2")]
     public IActionResult Run(
-        [HttpTrigger(AuthorizationLevel.Function, "get")]
-        HttpRequest req,
-        ILogger log)
+        [HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req)
     {
         Response.Headers.Add("Cache-Control", "no-cache");
 
@@ -99,71 +137,120 @@ public class Function2(IHttpContextAccessor httpContextAccessor) : HttpFunctionB
 }
 ```
 
-### Support URL generation
+### URL Generation
+
+Generate URLs to other functions using `CreatedAtFunction()` and `AcceptedAtFunction()`.
 
 ```csharp
 public class Function3(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
 {
     [FunctionName("Function3")]
     public IActionResult Run(
-        [HttpTrigger(AuthorizationLevel.Function, "get", Route = "route/{id}")]
-        HttpRequest req,
-        string id,
-        ILogger log)
+        [HttpTrigger(AuthorizationLevel.Function, "get", Route = "route/{id}")] HttpRequest req,
+        string id)
     {
         return CreatedAtFunction("Function3", new { id = "kazuakix" }, null);
     }
 }
 ```
 
-### Handle static files
+### Static File Hosting
+
+Serve files from the `wwwroot` directory with automatic content-type detection.
 
 ```csharp
 public class Function1(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
 {
     [FunctionName("Function1")]
     public IActionResult Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req,
-        ILogger log)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
     {
         return File("sample.html");
     }
 }
 ```
 
-### Simple reverse proxy
+### Reverse Proxy
+
+Forward incoming requests to a backend service. Route parameters are automatically substituted in the backend URI.
 
 ```csharp
-public class Function1(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
+public class ReverseProxy(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
 {
-    [FunctionName("Function1")]
+    [FunctionName(nameof(ReverseProxy))]
     public IActionResult Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "{*path}"})] HttpRequest req,
-        ILogger log)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "put", "delete", Route = "{*path}")] HttpRequest req)
     {
         return Proxy("https://example.com/{path}");
     }
 }
 ```
 
-### Streamlined SPA / SSG hosting
+### SPA / SSG Hosting
+
+Host single-page applications or static sites with client-side routing support. Use `LocalStaticApp()` to serve from the local `wwwroot` directory, or `RemoteStaticApp()` to proxy to a remote origin.
 
 ```csharp
-public class Function1(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
+public class StaticWebsite(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
 {
-    [FunctionName("Function1")]
+    [FunctionName(nameof(StaticWebsite))]
     public IActionResult Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "{*path}"})] HttpRequest req,
-        ILogger log)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "{*path}")] HttpRequest req)
     {
-#if USE_REMOTE
-        return RemoteStaticApp("https://example.com", fallbackExclude: $"^/_nuxt/.*");
-#else
-        return LocalStaticApp(fallbackPath: "404.html", fallbackExclude: $"^/_nuxt/.*");
-#endif
+        // Serve from local wwwroot with SPA fallback
+        return LocalStaticApp(fallbackPath: "200.html", fallbackExclude: "^/_nuxt/.*");
     }
 }
 ```
+
+```csharp
+// Or proxy to a remote static site
+return RemoteStaticApp("https://example.com", fallbackExclude: "^/_nuxt/.*");
+```
+
+### App Service Authentication
+
+When App Service Authentication (EasyAuth) is enabled, access the authenticated user via the `User` property.
+
+```csharp
+public class SecureFunction(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
+{
+    [Function("SecureFunction")]
+    public IActionResult Run(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
+    {
+        if (!User.Identity.IsAuthenticated)
+        {
+            return Unauthorized();
+        }
+
+        return Ok($"Hello, {User.Identity.Name}");
+    }
+}
+```
+
+## Available Helpers
+
+| Method | Description |
+|--------|-------------|
+| `Ok()` / `Ok(value)` | Returns 200 OK |
+| `BadRequest()` / `BadRequest(ModelState)` | Returns 400 Bad Request |
+| `Unauthorized()` | Returns 401 Unauthorized |
+| `Forbid()` | Returns 403 Forbidden |
+| `NotFound()` / `NotFound(value)` | Returns 404 Not Found |
+| `Conflict()` / `Conflict(ModelState)` | Returns 409 Conflict |
+| `NoContent()` | Returns 204 No Content |
+| `StatusCode(code)` | Returns a custom status code |
+| `Content(string, contentType)` | Returns content with a specific content type |
+| `File(path)` / `File(bytes, contentType)` / `File(stream, contentType)` | Returns a file response |
+| `CreatedAtFunction(functionName, routeValues, value)` | Returns 201 with a Location header pointing to the specified function |
+| `AcceptedAtFunction(functionName, routeValues, value)` | Returns 202 with a Location header pointing to the specified function |
+| `TryValidateModel(model)` | Validates the model using DataAnnotations |
+| `ValidationProblem(ModelState)` | Returns RFC 7807 Problem Details for validation errors |
+| `Problem(detail, instance, statusCode, title, type)` | Returns RFC 7807 Problem Details |
+| `Proxy(backendUri)` | Forwards the request to a backend service |
+| `LocalStaticApp(fallbackPath, fallbackExclude)` | Serves static files from local `wwwroot` |
+| `RemoteStaticApp(backendUri, fallbackExclude)` | Proxies to a remote static site with SPA fallback |
 
 ## License
 
