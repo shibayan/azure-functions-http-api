@@ -1,6 +1,4 @@
-﻿using System;
-
-using Azure.WebJobs.Extensions.HttpApi.Routing;
+﻿using Azure.WebJobs.Extensions.HttpApi.Routing;
 
 using Microsoft.Azure.WebJobs;
 

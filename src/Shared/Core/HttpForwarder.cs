@@ -1,23 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.Net;
 
 using Microsoft.AspNetCore.Http;
 
 namespace Azure.WebJobs.Extensions.HttpApi.Internal;
 
-internal class HttpForwarder
+internal sealed class HttpForwarder
 {
-    public async Task SendAsync(string destinationUri, HttpContext httpContext, Action<HttpRequestMessage> beforeSend = null, Action<HttpResponseMessage> afterSend = null)
+    public async Task SendAsync(string destinationUri, HttpContext httpContext, Action<HttpRequestMessage>? beforeSend = null, Action<HttpResponseMessage>? afterSend = null)
     {
-        var request = new HttpRequestMessage
-        {
-            Method = GetHttpMethod(httpContext.Request.Method),
-            RequestUri = new Uri(destinationUri)
-        };
+        ArgumentNullException.ThrowIfNull(destinationUri);
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        using var request = new HttpRequestMessage();
+
+        request.Method = GetHttpMethod(httpContext.Request.Method);
+        request.RequestUri = new Uri(destinationUri);
 
         if (HasRequestBody(httpContext))
         {
@@ -28,7 +25,7 @@ internal class HttpForwarder
 
         beforeSend?.Invoke(request);
 
-        var response = await _httpClient.SendAsync(request, httpContext.RequestAborted);
+        using var response = await s_httpClient.SendAsync(request, httpContext.RequestAborted);
 
         afterSend?.Invoke(response);
 
@@ -76,9 +73,9 @@ internal class HttpForwarder
                 continue;
             }
 
-            if (!request.Headers.TryAddWithoutValidation(name, (string)value))
+            if (!request.Headers.TryAddWithoutValidation(name, (string?)value))
             {
-                request.Content?.Headers.TryAddWithoutValidation(name, (string)value);
+                request.Content?.Headers.TryAddWithoutValidation(name, (string?)value);
             }
         }
     }
@@ -106,7 +103,7 @@ internal class HttpForwarder
         }
     }
 
-    private readonly HttpMessageInvoker _httpClient = new(new SocketsHttpHandler
+    private static readonly HttpMessageInvoker s_httpClient = new(new SocketsHttpHandler
     {
         AllowAutoRedirect = false,
         AutomaticDecompression = DecompressionMethods.None,
@@ -114,10 +111,5 @@ internal class HttpForwarder
         UseProxy = false
     });
 
-    private static readonly HashSet<string> s_skipHeaders = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "Host",
-        "Connection",
-        "Transfer-Encoding"
-    };
+    private static readonly HashSet<string> s_skipHeaders = new(["Host", "Connection", "Transfer-Encoding"], StringComparer.OrdinalIgnoreCase);
 }
