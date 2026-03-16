@@ -1,14 +1,12 @@
-﻿using Azure.WebJobs.Extensions.HttpApi.Internal;
-
-using Microsoft.AspNetCore.Routing;
+﻿using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host.Config;
 using Microsoft.Extensions.Hosting;
 
-namespace Azure.WebJobs.Extensions.HttpApi.Routing;
+namespace Azure.WebJobs.Extensions.HttpApi.Internal;
 
-public class RoutePrecedenceExtensionConfigProvider : IExtensionConfigProvider
+internal sealed class RoutePrecedenceExtensionConfigProvider : IExtensionConfigProvider
 {
     private readonly IWebJobsRouter _router;
 
@@ -16,16 +14,16 @@ public class RoutePrecedenceExtensionConfigProvider : IExtensionConfigProvider
     {
         _router = router;
 
-        hostApplicationLifetime.ApplicationStarted.Register(PrecedenceRoutes);
+        hostApplicationLifetime.ApplicationStarted.Register(ApplyRoutePrecedence);
     }
 
-    public void Initialize(ExtensionConfigContext _) { }
+    public void Initialize(ExtensionConfigContext context) { }
 
-    public void PrecedenceRoutes()
+    public void ApplyRoutePrecedence()
     {
         var routes = _router.GetRoutes();
 
-        if (routes.Count is <= 1)
+        if (routes.Count <= 1)
         {
             return;
         }

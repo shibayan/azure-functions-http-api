@@ -8,7 +8,15 @@ internal sealed class HttpContextAccessorMiddleware(IHttpContextAccessor httpCon
 {
     public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
     {
-        httpContextAccessor.HttpContext = context.GetHttpContext();
+        var httpContext = context.GetHttpContext();
+
+        if (httpContext is null)
+        {
+            await next(context);
+            return;
+        }
+
+        httpContextAccessor.HttpContext = httpContext;
 
         try
         {

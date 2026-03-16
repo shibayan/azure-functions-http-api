@@ -1,17 +1,13 @@
 ﻿namespace Azure.WebJobs.Extensions.HttpApi.Internal;
 
-internal static class FunctionAppEnvironment
+internal static class FunctionEnvironment
 {
     private const string WebsiteSiteNameVariableName = "WEBSITE_SITE_NAME";
     private const string WebsiteAuthEnabledVariableName = "WEBSITE_AUTH_ENABLED";
 
-    private static readonly bool s_isRunningOnAzure = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(WebsiteSiteNameVariableName));
-    private static readonly bool s_isAuthenticationEnabled = bool.TryParse(Environment.GetEnvironmentVariable(WebsiteAuthEnabledVariableName), out var result) && result;
-    private static readonly string s_rootPath = s_isRunningOnAzure ? Environment.ExpandEnvironmentVariables("%HOME%/site/wwwroot") : Environment.CurrentDirectory;
+    public static bool IsRunningOnAzure { get; } = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(WebsiteSiteNameVariableName));
 
-    public static bool IsRunningOnAzure => s_isRunningOnAzure;
+    public static bool IsAuthenticationEnabled { get; } = bool.TryParse(Environment.GetEnvironmentVariable(WebsiteAuthEnabledVariableName), out var result) && result;
 
-    public static bool IsAuthenticationEnabled => s_isAuthenticationEnabled;
-
-    public static string RootPath => s_rootPath;
+    public static string RootPath { get; } = IsRunningOnAzure ? Environment.ExpandEnvironmentVariables("%HOME%/site/wwwroot") : Environment.CurrentDirectory;
 }

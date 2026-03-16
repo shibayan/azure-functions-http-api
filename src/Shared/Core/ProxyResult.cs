@@ -6,9 +6,9 @@ public class ProxyResult(string backendUri) : IActionResult
 {
     public string BackendUri { get; } = backendUri ?? throw new ArgumentNullException(nameof(backendUri));
 
-    public Action<HttpRequestMessage>? BeforeSend { get; set; }
+    public Func<HttpRequestMessage, Task>? BeforeSend { get; set; }
 
-    public Action<HttpResponseMessage>? AfterSend { get; set; }
+    public Func<HttpResponseMessage, Task>? AfterSend { get; set; }
 
     private static readonly ProxyResultExecutor s_executor = new();
 

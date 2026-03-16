@@ -17,7 +17,7 @@ An extension library that brings ASP.NET Core-like developer experience to Azure
 - **URL generation** — Generate URLs to other functions with `CreatedAtFunction()` and `AcceptedAtFunction()`
 - **Static file hosting** — Serve files from `wwwroot` with automatic content-type detection
 - **Reverse proxy** — Forward requests to backend services with `Proxy()`, supporting route template substitution
-- **SPA / SSG hosting** — Host single-page applications with `LocalStaticApp()` or `RemoteStaticApp()`, including fallback routing and path exclusion
+- **SPA / SSG hosting** — Host single-page applications with `LocalStaticApp()`, including fallback routing and path exclusion
 - **App Service Authentication** — Access authenticated user info via the `User` property with App Service Authentication (EasyAuth) support
 - **Better route precedence** — Improved route matching behavior over default Azure Functions routing
 
@@ -39,12 +39,13 @@ dotnet add package WebJobs.Extensions.HttpApi
 
 ### Isolated Worker
 
+Use ASP.NET Core integration in `Program.cs`. The extension is registered automatically by the package.
+
 ```csharp
 // Program.cs
 var builder = FunctionsApplication.CreateBuilder(args);
 
-builder.ConfigureFunctionsWebApplication()
-       .AddHttpApi();
+builder.ConfigureFunctionsWebApplication();
 
 builder.Build().Run();
 ```
@@ -173,6 +174,7 @@ public class Function1(IHttpContextAccessor httpContextAccessor) : HttpFunctionB
 ### Reverse Proxy
 
 Forward incoming requests to a backend service. Route parameters are automatically substituted in the backend URI.
+You can also inspect or modify the proxied request and response with async hooks.
 
 ```csharp
 public class ReverseProxy(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
@@ -181,14 +183,27 @@ public class ReverseProxy(IHttpContextAccessor httpContextAccessor) : HttpFuncti
     public IActionResult Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "put", "delete", Route = "{*path}")] HttpRequest req)
     {
-        return Proxy("https://example.com/{path}");
+        return Proxy(
+            "https://example.com/{path}",
+            async request =>
+            {
+                request.Headers.Add("X-Forwarded-By", "azure-functions-http-api");
+                await Task.CompletedTask;
+            },
+            async response =>
+            {
+                response.Headers.Add("X-Proxied", "true");
+                await Task.CompletedTask;
+            });
     }
 }
 ```
 
 ### SPA / SSG Hosting
 
-Host single-page applications or static sites with client-side routing support. Use `LocalStaticApp()` to serve from the local `wwwroot` directory, or `RemoteStaticApp()` to proxy to a remote origin.
+Host single-page applications or static sites with client-side routing support. `LocalStaticApp()` serves files from the local `wwwroot` directory and applies a fallback file when the requested path does not exist.
+
+Use a catch-all route such as `{*path}` so the static app handler can resolve the requested virtual path.
 
 ```csharp
 public class StaticWebsite(IHttpContextAccessor httpContextAccessor) : HttpFunctionBase(httpContextAccessor)
@@ -198,14 +213,9 @@ public class StaticWebsite(IHttpContextAccessor httpContextAccessor) : HttpFunct
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "{*path}")] HttpRequest req)
     {
         // Serve from local wwwroot with SPA fallback
-        return LocalStaticApp(fallbackPath: "200.html", fallbackExclude: "^/_nuxt/.*");
+        return LocalStaticApp(fallbackPath: "200.html", fallbackExcludePattern: "^/_nuxt/.*");
     }
 }
-```
-
-```csharp
-// Or proxy to a remote static site
-return RemoteStaticApp("https://example.com", fallbackExclude: "^/_nuxt/.*");
 ```
 
 ### App Service Authentication
@@ -248,9 +258,8 @@ public class SecureFunction(IHttpContextAccessor httpContextAccessor) : HttpFunc
 | `TryValidateModel(model)` | Validates the model using DataAnnotations |
 | `ValidationProblem(ModelState)` | Returns RFC 7807 Problem Details for validation errors |
 | `Problem(detail, instance, statusCode, title, type)` | Returns RFC 7807 Problem Details |
-| `Proxy(backendUri)` | Forwards the request to a backend service |
-| `LocalStaticApp(fallbackPath, fallbackExclude)` | Serves static files from local `wwwroot` |
-| `RemoteStaticApp(backendUri, fallbackExclude)` | Proxies to a remote static site with SPA fallback |
+| `Proxy(backendUri, beforeSend, afterSend)` | Forwards the request to a backend service with optional async hooks |
+| `LocalStaticApp(defaultFile, fallbackPath, fallbackExcludePattern)` | Serves static files from local `wwwroot` with SPA fallback |
 
 ## License
 
