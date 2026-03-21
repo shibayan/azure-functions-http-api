@@ -1,12 +1,13 @@
 ﻿using Azure.Functions.Worker.Extensions.HttpApi.Internal;
 
-using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Azure.Functions.Worker.Extensions.HttpApi;
+#pragma warning disable IDE0130
+namespace Microsoft.Azure.Functions.Worker;
+#pragma warning restore IDE0130
 
-public static class HttpApiBuilderBuilderExtensions
+public static class HttpApiBuilderExtensions
 {
     public static IFunctionsWorkerApplicationBuilder ConfigureHttpApiExtension(this IFunctionsWorkerApplicationBuilder builder)
     {
@@ -14,7 +15,7 @@ public static class HttpApiBuilderBuilderExtensions
 
         builder.Services.AddHttpContextAccessor();
 
-        return builder.UseMiddleware<InitializerMiddleware>()
+        return builder.UseMiddleware<EndpointRouteNameMetadataMiddleware>()
                       .UseMiddleware<HttpContextAccessorMiddleware>()
                       .UseMiddleware<AppServiceAuthenticationMiddleware>();
     }

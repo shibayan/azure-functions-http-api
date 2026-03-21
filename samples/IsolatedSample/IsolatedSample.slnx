@@ -1,4 +1,4 @@
 <Solution>
-  <Project Path="../../src/Functions.Worker.Extensions.HttpApi/Functions.Worker.Extensions.HttpApi.csproj" />
+  <Project Path="../../src/Worker.Extensions.HttpApi/Worker.Extensions.HttpApi.csproj" />
   <Project Path="IsolatedSample.csproj" />
 </Solution>

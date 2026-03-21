@@ -6,7 +6,7 @@ namespace Azure.WebJobs.Extensions.HttpApi;
 
 public static class HttpApiWebJobsBuilderExtensions
 {
-    public static IWebJobsBuilder AddHttpApi(this IWebJobsBuilder builder)
+    public static IWebJobsBuilder ConfigureHttpApiExtension(this IWebJobsBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
 

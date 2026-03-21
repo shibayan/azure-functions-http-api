@@ -8,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Azure.Functions.Worker.Extensions.HttpApi.Internal;
 
-internal sealed class InitializerMiddleware(IServiceProvider serviceProvider) : IFunctionsWorkerMiddleware
+internal sealed class EndpointRouteNameMetadataMiddleware(IServiceProvider serviceProvider) : IFunctionsWorkerMiddleware
 {
     private volatile bool _initialized;
 
