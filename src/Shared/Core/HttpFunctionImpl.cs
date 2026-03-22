@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.ComponentModel;
+using System.Security.Claims;
 using System.Text;
 
 using Azure.WebJobs.Extensions.HttpApi.Internal;
@@ -18,6 +19,11 @@ using Microsoft.Net.Http.Headers;
 
 namespace Azure.WebJobs.Extensions.HttpApi.Core;
 
+/// <summary>
+/// Infrastructure base class that provides HTTP helper methods for Azure Functions.
+/// Do not inherit from this class directly; use <c>HttpFunctionBase</c> instead.
+/// </summary>
+[EditorBrowsable(EditorBrowsableState.Never)]
 public abstract class HttpFunctionImpl(IHttpContextAccessor httpContextAccessor)
 {
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
@@ -27,15 +33,15 @@ public abstract class HttpFunctionImpl(IHttpContextAccessor httpContextAccessor)
 
     private const string DefaultContentType = "application/octet-stream";
 
-    private static readonly PhysicalFileProvider s_fileProvider = new(FunctionAppEnvironment.RootPath);
+    private static readonly PhysicalFileProvider s_fileProvider = new(FunctionEnvironment.RootPath);
     private static readonly FileExtensionContentTypeProvider s_contentTypeProvider = new();
 
-    protected HttpContext HttpContext => _httpContextAccessor.HttpContext ?? throw new InvalidOperationException("The current function invocation does not have an active HTTP context.");
+    protected HttpContext HttpContext => _httpContextAccessor.HttpContext ?? throw new InvalidOperationException("No active HTTP context is available for the current function invocation. This API can only be used during an HTTP-triggered invocation.");
     protected HttpRequest Request => HttpContext.Request;
     protected HttpResponse Response => HttpContext.Response;
     protected ClaimsPrincipal User => HttpContext.User;
     protected ModelStateDictionary ModelState { get; } = new();
-    protected bool IsAuthenticationEnabled => FunctionAppEnvironment.IsAuthenticationEnabled;
+    protected bool IsAuthenticationEnabled => FunctionEnvironment.IsAuthenticationEnabled;
 
     protected IUrlHelper Url
     {
@@ -186,25 +192,24 @@ public abstract class HttpFunctionImpl(IHttpContextAccessor httpContextAccessor)
     protected AcceptedResult AcceptedAtFunction(string functionName, object? routeValues, object? value)
         => Accepted(GetFunctionLink(functionName, routeValues), value);
 
+    /// <summary>
+    /// Returns a 403 Forbidden status code result. Unlike ASP.NET Core's <c>ControllerBase.Forbid()</c>,
+    /// this does not trigger an authentication challenge because Azure Functions does not support challenge schemes.
+    /// </summary>
     protected StatusCodeResult Forbid() => StatusCode(StatusCodes.Status403Forbidden);
+
+    /// <inheritdoc cref="Forbid()"/>
     protected ObjectResult Forbid(object? value) => StatusCode(StatusCodes.Status403Forbidden, value);
 
-    protected ProxyResult Proxy(string backendUri, Action<HttpRequestMessage>? beforeSend = null, Action<HttpResponseMessage>? afterSend = null)
+    protected ProxyResult Proxy(string backendUri, Func<HttpRequestMessage, Task>? beforeSend = null, Func<HttpResponseMessage, Task>? afterSend = null)
     {
         ArgumentNullException.ThrowIfNull(backendUri);
 
         return new ProxyResult(backendUri) { BeforeSend = beforeSend, AfterSend = afterSend };
     }
 
-    protected RemoteStaticAppResult RemoteStaticApp(string backendUri, string? fallbackExclude = null)
-    {
-        ArgumentNullException.ThrowIfNull(backendUri);
-
-        return new RemoteStaticAppResult(backendUri) { FallbackExclude = fallbackExclude };
-    }
-
-    protected LocalStaticAppResult LocalStaticApp(string defaultFile = "index.html", string fallbackPath = "404.html", string? fallbackExclude = null)
-        => new() { DefaultFile = defaultFile, FallbackPath = fallbackPath, FallbackExclude = fallbackExclude };
+    protected LocalStaticAppResult LocalStaticApp(string defaultFile = "index.html", string fallbackPath = "404.html", string? fallbackExcludePattern = null)
+        => new() { DefaultFile = defaultFile, FallbackPath = fallbackPath, FallbackExcludePattern = fallbackExcludePattern };
 
     #endregion
 
@@ -221,8 +226,8 @@ public abstract class HttpFunctionImpl(IHttpContextAccessor httpContextAccessor)
 
     private string GetFunctionLink(string functionName, object? routeValues)
     {
-        ArgumentNullException.ThrowIfNull(functionName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(functionName);
 
-        return Url.Link(functionName, routeValues) ?? throw new InvalidOperationException($"Could not generate a URL for function '{functionName}'.");
+        return Url.Link(functionName, routeValues) ?? throw new InvalidOperationException($"Failed to generate a URL for function '{functionName}'. Ensure the function name matches a registered route name and that all required route values were provided.");
     }
 }

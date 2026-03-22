@@ -11,7 +11,7 @@ If you find a bug, please open an [issue](https://github.com/shibayan/azure-func
 - Steps to reproduce the issue
 - Expected and actual behavior
 - .NET version and Azure Functions runtime version
-- Package version (`WebJobs.Extensions.HttpApi` or `Functions.Worker.Extensions.HttpApi`)
+- Package version (`WebJobs.Extensions.HttpApi` or `Worker.Extensions.HttpApi`)
 
 ### Suggesting Features
 

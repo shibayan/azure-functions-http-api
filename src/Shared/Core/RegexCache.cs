@@ -5,8 +5,9 @@ namespace Azure.WebJobs.Extensions.HttpApi.Internal;
 
 internal static class RegexCache
 {
+    private static readonly TimeSpan s_matchTimeout = TimeSpan.FromSeconds(1);
     private static readonly ConcurrentDictionary<string, Regex> s_cache = new(StringComparer.Ordinal);
 
     public static bool IsMatch(string input, string pattern)
-        => s_cache.GetOrAdd(pattern, static value => new Regex(value, RegexOptions.Compiled | RegexOptions.CultureInvariant)).IsMatch(input);
+        => s_cache.GetOrAdd(pattern, static value => new Regex(value, RegexOptions.Compiled | RegexOptions.CultureInvariant, s_matchTimeout)).IsMatch(input);
 }

@@ -1,12 +1,12 @@
-﻿using Azure.WebJobs.Extensions.HttpApi.Routing;
+﻿using Azure.WebJobs.Extensions.HttpApi.Internal;
 
 using Microsoft.Azure.WebJobs;
 
-namespace Azure.WebJobs.Extensions.HttpApi.Config;
+namespace Azure.WebJobs.Extensions.HttpApi;
 
 public static class HttpApiWebJobsBuilderExtensions
 {
-    public static IWebJobsBuilder AddHttpApi(this IWebJobsBuilder builder)
+    public static IWebJobsBuilder ConfigureHttpApiExtension(this IWebJobsBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
 

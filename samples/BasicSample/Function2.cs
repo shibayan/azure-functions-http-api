@@ -18,7 +18,7 @@ public class Function2(IHttpContextAccessor httpContextAccessor) : HttpFunctionB
         HttpRequest req,
         ILogger log)
     {
-        Response.Headers.Add("Cache-Control", "no-cache");
+        Response.Headers.Append("Cache-Control", "no-cache");
 
         return Ok($"Now: {DateTime.Now}");
     }

@@ -16,17 +16,25 @@ internal sealed partial class ProxyResultExecutor : IActionResultExecutor<ProxyR
     {
         try
         {
-            var backendUri = MakeBackendUri(result.BackendUri, context);
+            var backendUri = BuildBackendUri(result.BackendUri, context);
 
             await s_httpForwarder.SendAsync(backendUri, context.HttpContext, result.BeforeSend, result.AfterSend);
         }
-        catch
+        catch (HttpRequestException)
+        {
+            context.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadGateway;
+        }
+        catch (OperationCanceledException) when (context.HttpContext.RequestAborted.IsCancellationRequested)
+        {
+            // Client disconnected — no response needed
+        }
+        catch (Exception) when (!context.HttpContext.Response.HasStarted)
         {
             context.HttpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
         }
     }
 
-    private static string MakeBackendUri(string backendUri, ActionContext context)
+    private static string BuildBackendUri(string backendUri, ActionContext context)
     {
         var routeValues = context.RouteData.Values;
 
@@ -38,7 +46,7 @@ internal sealed partial class ProxyResultExecutor : IActionResultExecutor<ProxyR
             {
                 var (_, value) = routeValues.First();
 
-                generatedBackendUri += generatedBackendUri.EndsWith("/") ? value : $"/{value}";
+                generatedBackendUri += generatedBackendUri.EndsWith('/') ? value : $"/{value}";
             }
         }
 

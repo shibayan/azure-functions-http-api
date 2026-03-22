@@ -13,7 +13,7 @@ public class Function2(IHttpContextAccessor httpContextAccessor, ILogger<Functio
     [Function("Function2")]
     public IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
     {
-        if (!User.Identity.IsAuthenticated)
+        if (!User.Identity?.IsAuthenticated ?? false)
         {
             return Unauthorized();
         }
