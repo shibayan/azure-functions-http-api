@@ -15,7 +15,7 @@ jobs:
     - name: Use .NET SDK
       uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
       with:
-        dotnet-version: 9.0.x
+        dotnet-version: 10.0.x
 
     - name: NuGet login
       uses: NuGet/login@d22cc5f58ff5b88bf9bd452535b4335137e24544 # v1.1.0
@@ -30,7 +30,7 @@ jobs:
     - name: Pack NuGet Packages
       run: |
         dotnet pack src/WebJobs.Extensions.HttpApi/WebJobs.Extensions.HttpApi.csproj -c Release -o ./dist -p:Version=${{ steps.setup_version.outputs.VERSION }}
-        dotnet pack src/Functions.Worker.Extensions.HttpApi/Functions.Worker.Extensions.HttpApi.csproj -c Release -o ./dist -p:Version=${{ steps.setup_version.outputs.VERSION }}
+        dotnet pack src/Worker.Extensions.HttpApi/Worker.Extensions.HttpApi.csproj -c Release -o ./dist -p:Version=${{ steps.setup_version.outputs.VERSION }}
 
     - name: Publish NuGet Packages
       run: dotnet nuget push dist/*.nupkg -k ${{ steps.login.outputs.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json

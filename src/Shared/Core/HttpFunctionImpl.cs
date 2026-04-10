@@ -208,8 +208,8 @@ public abstract class HttpFunctionImpl(IHttpContextAccessor httpContextAccessor)
         return new ProxyResult(backendUri) { BeforeSend = beforeSend, AfterSend = afterSend };
     }
 
-    protected LocalStaticAppResult LocalStaticApp(string defaultFile = "index.html", string fallbackPath = "404.html", string? fallbackExcludePattern = null)
-        => new() { DefaultFile = defaultFile, FallbackPath = fallbackPath, FallbackExcludePattern = fallbackExcludePattern };
+    protected LocalStaticAppResult LocalStaticApp(string requestPath, string defaultFile = "index.html", string fallbackPath = "404.html", string? fallbackExcludePattern = null)
+        => new() { RequestPath = requestPath, DefaultFile = defaultFile, FallbackPath = fallbackPath, FallbackExcludePattern = fallbackExcludePattern };
 
     #endregion
 
