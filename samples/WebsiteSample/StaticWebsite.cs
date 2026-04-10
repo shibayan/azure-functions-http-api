@@ -12,10 +12,9 @@ public class StaticWebsite(IHttpContextAccessor httpContextAccessor) : HttpFunct
     [FunctionName(nameof(StaticWebsite))]
     public IActionResult Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "put", "delete", "options", "head", "patch", Route = "{*path}")]
-        HttpRequest req)
+        HttpRequest req,
+        string path)
     {
-        //return RemoteStaticApp("https://ststaticwebsiteproxy.z11.web.core.windows.net", fallbackExclude: $"^/_nuxt/.*");
-
-        return LocalStaticApp(fallbackPath: "200.html", fallbackExclude: $"^/_nuxt/.*");
+        return LocalStaticApp(path, fallbackPath: "200.html", fallbackExcludePattern: "^/_nuxt/.*");
     }
 }

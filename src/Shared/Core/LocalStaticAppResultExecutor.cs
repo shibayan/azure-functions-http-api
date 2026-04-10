@@ -19,14 +19,7 @@ internal sealed class LocalStaticAppResultExecutor : IActionResultExecutor<Local
 
     public async Task ExecuteAsync(ActionContext context, LocalStaticAppResult result)
     {
-        var routeValues = context.RouteData.Values;
-
-        if (routeValues.Count == 0)
-        {
-            throw new InvalidOperationException("No route values found. The LocalStaticApp result requires a route with at least one parameter (e.g., '{*path}').");
-        }
-
-        var virtualPath = $"/{routeValues.First().Value}";
+        var virtualPath = $"/{result.RequestPath}";
 
         var contents = s_fileProvider.GetDirectoryContents(virtualPath);
 

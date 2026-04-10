@@ -9,6 +9,8 @@ namespace Azure.WebJobs.Extensions.HttpApi.Core;
 /// </summary>
 public class LocalStaticAppResult : IActionResult
 {
+    public required string RequestPath { get; set; }
+
     public string DefaultFile { get; set; } = "index.html";
 
     public string FallbackPath { get; set; } = "404.html";
